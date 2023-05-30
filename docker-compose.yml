@@ -1,0 +1,58 @@
+version: "3.1"
+services:
+  react-client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    ports:
+      - 3000:3000
+    container_name: react-ui
+    networks:
+      - mern-stack-net
+    depends_on:
+      - express-server
+    tty: true
+    stdin_open: true
+
+  express-server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    ports:
+      - 3080:3080
+    container_name: express-server
+    networks:
+      - mern-stack-net
+    depends_on:
+      - mongo
+
+  mongo:
+    image: mongo
+    container_name: mongodb
+    ports:
+      - 27017:27017
+    networks:
+      - mern-stack-net
+    volumes:
+      - mongo-data:/data/db
+
+  mongo-express:
+    image: mongo-express
+    container_name: mongo-express
+    restart: always
+    depends_on:
+      - mongo
+    ports:
+      - 8081:8081
+    networks:
+      - mern-stack-net
+    environment:
+      ME_CONFIG_MONGODB_URL: mongodb://mongo:27017/
+
+networks:
+  mern-stack-net:
+    driver: bridge
+
+volumes:
+  mongo-data:
+    driver: local

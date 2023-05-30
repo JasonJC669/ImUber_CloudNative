@@ -76,19 +76,19 @@ class Links extends Component {
         const Driver_ID = { ID }
         await api.Driver_login(Driver_ID)
         // window.alert(`Driver login successfully`)
-        this.setState({ ID: '', driver_flag: true })
+        this.setState({ ID: ID, driver_flag: true })
     }
 
     Passenger_Login = async () => {
-        const { ID } = this.state
-        const Driver_ID = { ID }
-        await api.Passenger_login(Driver_ID)
-        // window.alert(`Passenger login successfully`)
-        this.setState({ ID: '', passenger_flag: true })
+        this.setState({ passenger_flag: true })
     }
 
     render() {
-        const { ID, chose_User_type } = this.state
+        const { ID, chose_User_type, passenger_flag } = this.state
+
+        if (passenger_flag) {
+            return <Redirect to="/passenger" />;
+        }
 
         if (chose_User_type) {
             return (

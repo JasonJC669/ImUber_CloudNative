@@ -95,7 +95,7 @@ class Links extends Component {
                 <Container>
                     <Wrapper>
                         <Title>Welcome to ImUber</Title>
-                        <Label>Hi {ID}! Are you going to be a passenger or a driver today?</Label>
+                        <Label>Hi {ID}! Are you going to be a driver or a passenger today?</Label>
                         <div style={{ display: 'flex', justifyContent: 'center' }}>
                             <Button onClick={this.Driver_Login}>司機</Button>
                             <Button onClick={this.Passenger_Login}>乘客</Button>

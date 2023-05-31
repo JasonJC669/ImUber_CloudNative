@@ -35,7 +35,7 @@ class PassengerMap extends Component {
 
     return (
       <LoadScript
-        googleMapsApiKey="AIzaSyDrdwF_FdA4Pa_7jpbBCXbzGZpIbAlLo8Q"
+        googleMapsApiKey=""
       >
         <GoogleMap
           mapContainerStyle={containerStyle}

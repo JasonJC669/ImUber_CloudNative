@@ -8,6 +8,8 @@ import api from '../api'
 
 import { GoogleMap, LoadScript } from '@react-google-maps/api';
 
+const API_KEY = process.env.REACT_APP_API_KEY;
+
 class PassengerMap extends Component {
   constructor(props) {
     super(props)
@@ -21,7 +23,7 @@ class PassengerMap extends Component {
         lat: 23.875591362481277,
         lng: 121.03022793405411
       },
-      zoom: 8
+      zoom: 8,
     }
   }
 
@@ -35,7 +37,7 @@ class PassengerMap extends Component {
 
     return (
       <LoadScript
-        googleMapsApiKey=""
+        googleMapsApiKey={API_KEY}
       >
         <GoogleMap
           mapContainerStyle={containerStyle}

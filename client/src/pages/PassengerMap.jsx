@@ -8,6 +8,23 @@ import api from '../api'
 
 import { GoogleMap, LoadScript } from '@react-google-maps/api';
 
+
+const OverlayTable = styled.div`
+  position: absolute;
+  margin-left: 20px;
+  margin-top: 20px; 
+  width: 10vw;
+  height: 100vh;
+  background-color: white
+`;
+
+const DataRow = styled.div`
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  border-bottom: 1px solid #ccc;
+`;
+
 class PassengerMap extends Component {
   constructor(props) {
     super(props)
@@ -46,6 +63,11 @@ class PassengerMap extends Component {
           { /* Child components, such as markers, info windows, etc. */}
           <></>
         </GoogleMap>
+        <OverlayTable>
+            <DataRow>安安</DataRow>
+            <DataRow>你好</DataRow>
+            <DataRow>滾</DataRow>
+        </OverlayTable>
       </LoadScript>
     )
   }

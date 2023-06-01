@@ -1,47 +1,54 @@
 import React, { Component } from 'react'
 // eslint-disable-next-line
-import styled from 'styled-components'
-// eslint-disable-next-line
 import { Redirect } from 'react-router-dom';
 // eslint-disable-next-line
 import api from '../api'
 
 import { Autocomplete, GoogleMap, LoadScript } from '@react-google-maps/api';
-import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import ListItemButton from '@mui/material/ListItemButton';
-import ListItemText from '@mui/material/ListItemText';
-import TextField from '@mui/material/TextField';
-import { Button } from '@mui/material';
 import Paper from '@mui/material/Paper';
 import InputBase from '@mui/material/InputBase';
-import Divider from '@mui/material/Divider';
-import IconButton from '@mui/material/IconButton';
-import MenuIcon from '@mui/icons-material/Menu';
-import SearchIcon from '@mui/icons-material/Search';
-import DirectionsIcon from '@mui/icons-material/Directions';
-import AddIcon from '@mui/icons-material/Add';
 import Stack from '@mui/material/Stack';
+import { styled } from '@mui/material/styles';
 
 const API_KEY = process.env.REACT_APP_API_KEY;
 
-const style = {
-  width: '100%',
-  maxWidth: 360,
-  bgcolor: 'background.paper',
-  borderRadius: theme => 2 * theme.shape.borderRadius
-};
+// const style = {
+//   width: '100%',
+//   maxWidth: 360,
+//   bgcolor: 'background.paper',
+//   borderRadius: theme => 2 * theme.shape.borderRadius
+// };
 
-const OverlayTable = styled.div`
-  position: fixed;
-  top: 10px;
-  left: 10px;
-  width: 250px;
-  height: auto;
-  background-color: white;
-  z-index: 1;
-  border-radius: 25px;
-`;
+// const OverlayTable = styled.div`
+//   position: fixed;
+//   top: 10px;
+//   left: 10px;
+//   width: 250px;
+//   height: auto;
+//   background-color: white;
+//   z-index: 1;
+//   border-radius: 25px;
+// `;
+
+// const OverlayTable = styled(Paper)({
+//   position: 'fixed',
+//   top: '10px',
+//   left: '10px',
+//   width: '250px',
+//   height: 'auto',
+//   bgcolor: 'white',
+//   zIndex: 1,
+//   borderRadius: '25px'
+// });
+
+const Item = styled(Paper)(({ theme }) => ({
+  backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
+  ...theme.typography.body2,
+  padding: theme.spacing(1),
+  textAlign: 'center',
+  color: theme.palette.text.secondary,
+  width: '380px',
+}));
 
 class DriverMap extends Component {
   constructor(props) {
@@ -57,68 +64,17 @@ class DriverMap extends Component {
       },
       zoom: 8,
       changeToPassenger: false,
-      searchText: '',
-      libraries: ['places']
+      libraries: ['places'],
+      places: [],
     }
     this.autocomplete = null
     this.onLoad = this.onLoad.bind(this)
     this.onPlaceChanged = this.onPlaceChanged.bind(this)
-    this.originRef = React.createRef()
-    this.destinationRef = React.createRef()
 
-    this.directionsCallback = this.directionsCallback.bind(this)
-  }
-
-  onZoomChanged = () => {
-    const { zoom } = this.state
-    this.setState({ zoom: zoom })
-  }
-
-  handleInputSearch = async event => {
-    const searchText = event.target.value
-    this.setState({ searchText: searchText })
-  }
-
-  handleListItemClick = (event, index) => {
-    console.log("Button" + index + "click");
-  };
-
-  renderListItemButton = () => {
-    const { searchText } = this.state
-    if (searchText !== '') {
-      return (
-        <List sx={style} component="nav" aria-label="mailbox folders">
-          <ListItemButton
-            divider
-            onClick={(event) => this.handleListItemClick(event, 0)}
-          >
-            <ListItemText primary="國立陽明交通大學" />
-          </ListItemButton>
-          <ListItemButton
-            divider
-            onClick={(event) => this.handleListItemClick(event, 0)}
-          >
-            <ListItemText primary="國立陽明交通大學" />
-          </ListItemButton>
-          <ListItemButton
-            divider
-            onClick={(event) => this.handleListItemClick(event, 1)}
-          >
-            <ListItemText primary="國立清華大學" />
-          </ListItemButton>
-          <ListItemButton
-            divider
-            onClick={(event) => this.handleListItemClick(event, 2)}
-          >
-            <ListItemText primary="台灣中油 光明站" />
-          </ListItemButton>
-          <ListItemButton
-            onClick={(event) => this.handleListItemClick(event, 3)}
-          >
-            <ListItemText primary="台積創新館" />
-          </ListItemButton>
-        </List>
-      )
+    this.inputRef = React.createRef()
+    this.currentInput = {
+      lat: 0,
+      lng: 0,
     }
   }
 
@@ -129,25 +85,54 @@ class DriverMap extends Component {
 
   onPlaceChanged() {
     if (this.autocomplete !== null) {
-      console.log(this.autocomplete.getPlace())
+      const place = this.autocomplete.getPlace();
+      if (place && place.geometry && place.geometry.location) {
+        const { lat, lng } = place.geometry.location;
+        this.currentInput = {
+          name: place.name,
+          lat: lat(),
+          lng: lng(),
+        }
+        this.handlePlaceAdd();
+        console.log('Place Latitude:', lat());
+        console.log('Place Longitude:', lng());
+      };
     } else {
       console.log('Autocomplete is not loaded yet!')
     }
   }
 
-  directionsCallback(response) {
-    console.log(response)
-    if (response !== null) {
-      if (response.status === 'OK') {
-        this.setState(
-          () => ({
-            response
-          })
-        )
-      } else {
-        console.log('response: ', response)
-      }
+  handlePlaceAdd = () => {
+    const { places } = this.state;
+    const updatedPlaces = [...places, this.currentInput];
+    this.setState({ places: updatedPlaces });
+    console.log("Success!!!");
+    console.log(places);
+  }
+
+  handleInputKeyPress = (event) => {
+    if (event.key === 'Enter') {
+      this.handlePlaceAdd();
     }
+  }
+
+  renderPlaceList = () => {
+    const { places } = this.state;
+    console.log("places.length = " + places.length)
+    if (places.length > 0) {
+      return (
+        <Paper
+          sx={{ p: '2px 4px', display: 'flex', alignItems: 'center', height: 'auto', width: 400, position: 'fixed', bottom: '10px', left: '10px', zIndex: 1 }}
+        >
+          <Stack spacing={1}>
+            <Item>Item 1</Item>
+            <Item>Item 2</Item>
+            <Item>Item 3</Item>
+          </Stack>
+        </Paper>
+      );
+    }
+    return null;
   }
 
   render() {
@@ -162,7 +147,7 @@ class DriverMap extends Component {
         libraries={libraries}
       >
         <Paper
-          component="form"
+          component="div"
           sx={{ p: '2px 4px', display: 'flex', alignItems: 'center', width: 400, position: 'fixed', top: '10px', left: '10px', zIndex: 1 }}
         >
           <Autocomplete
@@ -170,20 +155,19 @@ class DriverMap extends Component {
             onPlaceChanged={this.onPlaceChanged}
           >
             <InputBase
-              sx={{ ml: 1, flex: 1 }}
+              sx={{ ml: 1, flex: 1, width: 390 }}
               placeholder="Search Google Maps"
               inputProps={{ 'aria-label': 'search google maps' }}
+              inputRef={this.inputRef}
+            // onKeyPress={this.handleInputKeyPress}
             />
           </Autocomplete>
-          <IconButton type="button" sx={{ p: '10px' }} aria-label="add">
-            <AddIcon />
-          </IconButton>
         </Paper>
+        {this.renderPlaceList()}
         <GoogleMap
           mapContainerStyle={containerStyle}
           center={center}
           zoom={zoom}
-          onZoomChanged={this.onZoomChanged}
           options={{
             zoomControl: false,
             streetViewControl: false,

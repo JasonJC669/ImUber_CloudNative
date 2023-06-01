@@ -9,6 +9,7 @@ import Paper from '@mui/material/Paper';
 import InputBase from '@mui/material/InputBase';
 import Stack from '@mui/material/Stack';
 import { styled } from '@mui/material/styles';
+import { Button } from '@mui/material';
 
 const API_KEY = process.env.REACT_APP_API_KEY;
 
@@ -125,9 +126,12 @@ class DriverMap extends Component {
           sx={{ p: '2px 4px', display: 'flex', alignItems: 'center', height: 'auto', width: 400, position: 'fixed', bottom: '10px', left: '10px', zIndex: 1 }}
         >
           <Stack spacing={1}>
-            <Item>Item 1</Item>
-            <Item>Item 2</Item>
-            <Item>Item 3</Item>
+            {places.map((place, index) => (
+              <Item key={index}>
+                {place.name ? place.name : "Unknown Place"}
+              </Item>
+            ))}
+            <Button variant="contained">開團(名稱待決定)</Button>
           </Stack>
         </Paper>
       );

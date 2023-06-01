@@ -6,12 +6,22 @@ import { Redirect } from 'react-router-dom';
 // eslint-disable-next-line
 import api from '../api'
 
-import { GoogleMap, LoadScript } from '@react-google-maps/api';
+import { Autocomplete, GoogleMap, LoadScript } from '@react-google-maps/api';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
 import TextField from '@mui/material/TextField';
+import { Button } from '@mui/material';
+import Paper from '@mui/material/Paper';
+import InputBase from '@mui/material/InputBase';
+import Divider from '@mui/material/Divider';
+import IconButton from '@mui/material/IconButton';
+import MenuIcon from '@mui/icons-material/Menu';
+import SearchIcon from '@mui/icons-material/Search';
+import DirectionsIcon from '@mui/icons-material/Directions';
+import AddIcon from '@mui/icons-material/Add';
+import Stack from '@mui/material/Stack';
 
 const API_KEY = process.env.REACT_APP_API_KEY;
 
@@ -25,8 +35,8 @@ const style = {
 const OverlayTable = styled.div`
   position: fixed;
   top: 10px;
-  left: 200px;
-  width: 25vw;
+  left: 10px;
+  width: 250px;
   height: auto;
   background-color: white;
   z-index: 1;
@@ -36,7 +46,6 @@ const OverlayTable = styled.div`
 class DriverMap extends Component {
   constructor(props) {
     super(props)
-
     this.state = {
       containerStyle: {
         width: '100vw',
@@ -48,8 +57,16 @@ class DriverMap extends Component {
       },
       zoom: 8,
       changeToPassenger: false,
-      searchText: ''
+      searchText: '',
+      libraries: ['places']
     }
+    this.autocomplete = null
+    this.onLoad = this.onLoad.bind(this)
+    this.onPlaceChanged = this.onPlaceChanged.bind(this)
+    this.originRef = React.createRef()
+    this.destinationRef = React.createRef()
+
+    this.directionsCallback = this.directionsCallback.bind(this)
   }
 
   onZoomChanged = () => {
@@ -105,52 +122,77 @@ class DriverMap extends Component {
     }
   }
 
+  onLoad(autocomplete) {
+    console.log('autocomplete: ', autocomplete)
+    this.autocomplete = autocomplete
+  }
+
+  onPlaceChanged() {
+    if (this.autocomplete !== null) {
+      console.log(this.autocomplete.getPlace())
+    } else {
+      console.log('Autocomplete is not loaded yet!')
+    }
+  }
+
+  directionsCallback(response) {
+    console.log(response)
+    if (response !== null) {
+      if (response.status === 'OK') {
+        this.setState(
+          () => ({
+            response
+          })
+        )
+      } else {
+        console.log('response: ', response)
+      }
+    }
+  }
+
   render() {
-    const { containerStyle, center, zoom, changeToPassenger, searchText } = this.state
+    const { containerStyle, center, zoom, changeToPassenger, libraries } = this.state
 
     if (changeToPassenger)
       return <Redirect to="/passenger" />;
 
     return (
-      <div>
-        <OverlayTable>
-          <div style={{
-            margin: "8px 0 8px 0",
-            height: "auto",
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
-          }} >
-            <TextField
-              id="outlined-search"
-              label="Search field"
-              size="small"
-              type="search"
-              value={searchText}
-              onChange={this.handleInputSearch}
-            />
-            {this.renderListItemButton()}
-          </div>
-        </OverlayTable>
-        <LoadScript
-          googleMapsApiKey={API_KEY}
+      <LoadScript
+        googleMapsApiKey={API_KEY}
+        libraries={libraries}
+      >
+        <Paper
+          component="form"
+          sx={{ p: '2px 4px', display: 'flex', alignItems: 'center', width: 400, position: 'fixed', top: '10px', left: '10px', zIndex: 1 }}
         >
-          <GoogleMap
-            mapContainerStyle={containerStyle}
-            center={center}
-            zoom={zoom}
-            onZoomChanged={this.onZoomChanged}
-            options={{
-              zoomControl: false,
-              streetViewControl: false,
-              mapTypeControl: false,
-              fullscreenControl: false,
-            }}
+          <Autocomplete
+            onLoad={this.onLoad}
+            onPlaceChanged={this.onPlaceChanged}
           >
-          </GoogleMap>
-        </LoadScript>
-      </div>
+            <InputBase
+              sx={{ ml: 1, flex: 1 }}
+              placeholder="Search Google Maps"
+              inputProps={{ 'aria-label': 'search google maps' }}
+            />
+          </Autocomplete>
+          <IconButton type="button" sx={{ p: '10px' }} aria-label="add">
+            <AddIcon />
+          </IconButton>
+        </Paper>
+        <GoogleMap
+          mapContainerStyle={containerStyle}
+          center={center}
+          zoom={zoom}
+          onZoomChanged={this.onZoomChanged}
+          options={{
+            zoomControl: false,
+            streetViewControl: false,
+            mapTypeControl: false,
+            fullscreenControl: false,
+          }}
+        >
+        </GoogleMap>
+      </LoadScript >
     )
   }
 }

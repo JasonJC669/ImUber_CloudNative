@@ -4,8 +4,13 @@ const Schema = mongoose.Schema
 const Passenger = new Schema(
     {
         name: { type: String, required: true },
-        time: { type: [String], required: true },
-        rating: { type: Number, required: true },
+        phone: { type: String, required: true },
+
+        destination: {String, Decimal128, Decimal128},
+
+        driverNumber: String,
+        time: [String],
+        location: {String, Decimal128, Decimal128},
     },
     { timestamps: true },
 )

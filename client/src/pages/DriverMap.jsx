@@ -4,7 +4,7 @@ import { Redirect } from 'react-router-dom';
 // eslint-disable-next-line
 import api from '../api'
 
-import { Autocomplete, GoogleMap, LoadScript } from '@react-google-maps/api';
+import { Autocomplete, GoogleMap, LoadScript, Marker, DirectionsService, DirectionsRenderer } from '@react-google-maps/api';
 import Paper from '@mui/material/Paper';
 import InputBase from '@mui/material/InputBase';
 import Stack from '@mui/material/Stack';
@@ -67,16 +67,16 @@ class DriverMap extends Component {
       changeToPassenger: false,
       libraries: ['places'],
       places: [],
+      responses: [],
+      renderDirectionsFlag: false,
     }
     this.autocomplete = null
     this.onLoad = this.onLoad.bind(this)
     this.onPlaceChanged = this.onPlaceChanged.bind(this)
 
     this.inputRef = React.createRef()
-    this.currentInput = {
-      lat: 0,
-      lng: 0,
-    }
+
+    this.directionsCallback = this.directionsCallback.bind(this)
   }
 
   onLoad(autocomplete) {
@@ -89,12 +89,7 @@ class DriverMap extends Component {
       const place = this.autocomplete.getPlace();
       if (place && place.geometry && place.geometry.location) {
         const { lat, lng } = place.geometry.location;
-        this.currentInput = {
-          name: place.name,
-          lat: lat(),
-          lng: lng(),
-        }
-        this.handlePlaceAdd();
+        this.handlePlaceAdd(place);
         console.log('Place Latitude:', lat());
         console.log('Place Longitude:', lng());
       };
@@ -103,12 +98,11 @@ class DriverMap extends Component {
     }
   }
 
-  handlePlaceAdd = () => {
+  handlePlaceAdd = (place_ele) => {
     const { places } = this.state;
-    const updatedPlaces = [...places, this.currentInput];
-    this.setState({ places: updatedPlaces });
-    console.log("Success!!!");
-    console.log(places);
+    const updatedPlaces = [...places, place_ele];
+    this.setState({ places: updatedPlaces, renderDirectionsFlag: true });
+    console.log('places: ', places);
   }
 
   handleInputKeyPress = (event) => {
@@ -135,6 +129,141 @@ class DriverMap extends Component {
           </Stack>
         </Paper>
       );
+    }
+    return null;
+  }
+
+  markerOnLoad = (marker, place_ele) => {
+    const { lat, lng } = place_ele.geometry.location;
+    this.setState({
+      center:
+      {
+        lat: lat(),
+        lng: lng(),
+      },
+      zoom: 15,
+    })
+  }
+
+  renderPlaceMarker = () => {
+    const { places } = this.state;
+    if (places.length > 0) {
+      return (
+        <>
+          {places.map((place, index) => (
+            <Marker
+              key={index}
+              onLoad={(marker) => this.markerOnLoad(marker, place)}
+              position={{
+                lat: place.geometry.location.lat(),
+                lng: place.geometry.location.lng(),
+              }}
+            />
+          ))}
+        </>
+      )
+    }
+    return null;
+  }
+
+  directionsCallback(response) {
+    const { responses } = this.state;
+    const updatedResponses = [...responses, response];
+    console.log('directionsCallback response: ', response)
+    if (response !== null) {
+      if (response.status === 'OK') {
+        this.setState({
+          renderDirectionsFlag: false,
+          responses: updatedResponses,
+        })
+      } else {
+        console.log('response: ', response)
+      }
+    }
+  }
+
+  callDirectionsService = () => {
+    const { places, renderDirectionsFlag } = this.state;
+    console.log('Called callDirectionsService()');
+    if (places.length > 1 && renderDirectionsFlag) {
+      return (
+        <>
+          {places.map((place, index) => {
+            if (index > 0 && places[index - 1].geometry && place.geometry) {
+              const origin = {
+                lat: places[index - 1].geometry.location.lat(),
+                lng: places[index - 1].geometry.location.lng(),
+              };
+              const destination = {
+                lat: place.geometry.location.lat(),
+                lng: place.geometry.location.lng(),
+              };
+
+              return (
+                <React.Fragment key={index}>
+                  <DirectionsService
+                    options={{
+                      destination,
+                      origin,
+                      travelMode: 'DRIVING',
+                    }}
+                    callback={this.directionsCallback}
+                    onLoad={(directionsService) => {
+                      console.log(
+                        'DirectionsService onLoad directionsService: ',
+                        directionsService
+                      );
+                    }}
+                    onUnmount={(directionsService) => {
+                      console.log(
+                        'DirectionsService onUnmount directionsService: ',
+                        directionsService
+                      );
+                    }}
+                  />
+                </React.Fragment>
+              );
+            }
+            return null;
+          })}
+        </>
+      )
+    }
+    return null;
+  }
+
+  renderDirections = () => {
+    const { responses } = this.state;
+    console.log('responses: ', responses)
+    if (responses.length > 0) {
+      return (
+        <>
+          {responses.map((response, index) => {
+            return (
+              <React.Fragment key={index}>
+                <DirectionsRenderer
+                  options={{
+                    suppressMarkers: true, // Here hide the marker form DirectionsService
+                    directions: response,
+                  }}
+                  onLoad={(directionsRenderer) => {
+                    console.log(
+                      'DirectionsRenderer onLoad directionsRenderer: ',
+                      directionsRenderer
+                    );
+                  }}
+                  onUnmount={(directionsRenderer) => {
+                    console.log(
+                      'DirectionsRenderer onUnmount directionsRenderer: ',
+                      directionsRenderer
+                    );
+                  }}
+                />
+              </React.Fragment>
+            );
+          })}
+        </>
+      )
     }
     return null;
   }
@@ -179,6 +308,9 @@ class DriverMap extends Component {
             fullscreenControl: false,
           }}
         >
+          {this.renderPlaceMarker()}
+          {this.callDirectionsService()}
+          {this.renderDirections()}
         </GoogleMap>
       </LoadScript >
     )

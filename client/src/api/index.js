@@ -5,10 +5,8 @@ const api = axios.create({
 })
 
 
-export const getAllDriver = () => api.get(`/driver`)
-
-export const Driver_login = Driver_ID => api.post(`/movie`, Driver_ID)
-export const Passenger_login = payload => api.post(`/movie`, payload)
+export const driver_login = driver_info => api.post(`login/driver`, driver_info)
+export const passenger_login = passenger_info => api.post(`/login/passenger`, passenger_info)
 
 export const insertMovie = payload => api.post(`/movie`, payload)
 export const getAllMovies = () => api.get(`/movies`)
@@ -17,9 +15,8 @@ export const deleteMovieById = id => api.delete(`/movie/${id}`)
 export const getMovieById = id => api.get(`/movie/${id}`)
 
 const apis = {
-    getAllDriver,
-    Driver_login,
-    Passenger_login,
+    driver_login,
+    passenger_login,
     insertMovie,
     getAllMovies,
     updateMovieById,

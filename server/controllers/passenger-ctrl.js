@@ -26,7 +26,7 @@ addPassenger = async (req, res) => {
                 error: err
             })
         }
-        else if (pass_exist) {
+        else if (!pass_exist) {
             const pass_new = new PassengerDB({name: Pname, phone: Pphone})
             console.log(pass_new)
             if (!pass_new) {
@@ -61,6 +61,9 @@ addPassenger = async (req, res) => {
             }
         }
         else{
+            console.log("Pname: " , Pname)
+            console.log("Pphone: ", Pphone)
+            console.log("(pass_exist.name: ", pass_exist.name)
             if(pass_exist.name == Pname){
                 console.log("[p-ctrl] paspassenger (", pass_exist.name, ") login success")
                 return res.status(201).json({

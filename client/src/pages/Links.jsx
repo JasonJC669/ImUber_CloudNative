@@ -1,10 +1,12 @@
 import React, { Component } from 'react'
 import styled from 'styled-components'
-import backgroundImage from '../public/first.png'
-// eslint-disable-next-line
 import { Redirect } from 'react-router-dom';
 
+import backgroundImage from '../public/first.png'
+// eslint-disable-next-line
 import api from '../api'
+
+import TextField from '@mui/material/TextField';
 
 const Container = styled.div`
     display: flex;
@@ -17,6 +19,8 @@ const Container = styled.div`
     border: none;
     padding: 0;
 `
+
+
 
 const Wrapper = styled.div`
     margin: 0 30px;
@@ -37,12 +41,6 @@ const Label = styled.label`
     margin: 5px;
 `
 
-const InputText = styled.input.attrs({
-    className: 'form-control',
-})`
-    margin: 5px;
-`
-
 const Button = styled.button.attrs({
     className: `btn btn-primary`,
 })`
@@ -54,40 +52,55 @@ class Links extends Component {
         super(props)
 
         this.state = {
-            ID: 'Max',
+            name: 'Max',
+            phone: '0900000000',
             chose_User_type: false,
-            driver_flag: false,
             passenger_flag: false,
+            driver_flag: false,
         }
     }
 
-    handle_Input_ID = async event => {
-        const ID = event.target.value
-        this.setState({ ID })
+    handle_Input_name = async event => {
+        const name = event.target.value
+        this.setState({ name: name })
+    }
+
+    handle_Input_phone = async event => {
+        const phone = event.target.value
+        this.setState({ phone: phone })
     }
 
     Login = async () => {
-        const { ID } = this.state
-        this.setState({ ID: ID, chose_User_type: true })
+        this.setState({ chose_User_type: true })
     }
 
     Driver_Login = async () => {
-        const { ID } = this.state
-        const Driver_ID = { ID }
-        await api.Driver_login(Driver_ID)
-        // window.alert(`Driver login successfully`)
-        this.setState({ ID: ID, driver_flag: true })
+        const { name, phone} = this.state
+        const driver_info = {name:name, phone: phone}
+
+        await api.driver_login(driver_info) 
+
+        this.setState({ passenger_flag: false, driver_flag: true })
     }
 
     Passenger_Login = async () => {
-        this.setState({ passenger_flag: true })
+        const { name, phone} = this.state
+        const passenger_info = {name:name, phone: phone}
+
+        await api.passenger_login(passenger_info) 
+
+        this.setState({ passenger_flag: false, driver_flag: true })
     }
 
     render() {
-        const { ID, chose_User_type, passenger_flag } = this.state
+        const { name, phone, chose_User_type, passenger_flag, driver_flag } = this.state
 
         if (passenger_flag) {
             return <Redirect to="/passenger" />;
+        }
+
+        if (driver_flag) {
+            return <Redirect to="/driver" />;
         }
 
         if (chose_User_type) {
@@ -95,7 +108,7 @@ class Links extends Component {
                 <Container>
                     <Wrapper>
                         <Title>Welcome to ImUber</Title>
-                        <Label>Hi {ID}! Are you going to be a driver or a passenger today?</Label>
+                        <Label>Hi {name}! Are you going to be a driver or a passenger today?</Label>
                         <div style={{ display: 'flex', justifyContent: 'center' }}>
                             <Button onClick={this.Driver_Login}>司機</Button>
                             <Button onClick={this.Passenger_Login}>乘客</Button>
@@ -110,12 +123,31 @@ class Links extends Component {
                 <Wrapper>
                     <Title>Welcome to ImUber</Title>
                     <Label>Please enter your name: </Label>
-                    <InputText
-                        type="text"
-                        value={ID}
-                        onChange={this.handle_Input_ID}
-                    />
-                    <Button onClick={this.Login}>登入</Button>
+                    <div style={{
+                        margin: "auto 30px auto 30px",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        height: "100%",
+                    }}>
+                        <TextField
+                            id="standard-search"
+                            label="Name"
+                            type="search"
+                            variant="standard"
+                            value={name}
+                            onChange={this.handle_Input_name}
+                        />
+                        <TextField
+                            id="standard-search"
+                            label="Phone"
+                            type="search"
+                            variant="standard"
+                            value={phone}
+                            onChange={this.handle_Input_phone}
+                        />
+                        <Button onClick={this.Login}>登入</Button>
+                    </div>
                 </Wrapper>
             </Container>
         )

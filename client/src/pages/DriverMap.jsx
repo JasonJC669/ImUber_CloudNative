@@ -70,6 +70,7 @@ class DriverMap extends Component {
       places: [],
       responses: [],
       renderDirectionsFlag: false,
+      openGroupFlag: false,
     }
     this.autocomplete = null
     this.onLoad = this.onLoad.bind(this)
@@ -282,15 +283,20 @@ class DriverMap extends Component {
 
     // Call api
 
+    this.setState({ openGroupFlag: true })
     window.alert(`Open Group Successful`)
     return
   }
 
   render() {
-    const { containerStyle, center, zoom, changeToPassenger, libraries } = this.state
+    const { containerStyle, center, zoom, changeToPassenger, libraries, openGroupFlag } = this.state
 
     if (changeToPassenger)
       return <Redirect to="/passenger" />;
+
+    if (openGroupFlag) {
+      return <Redirect to="/driver/group" />;
+    }
 
     return (
       <LoadScript

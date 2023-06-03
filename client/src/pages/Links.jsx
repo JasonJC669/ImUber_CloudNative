@@ -87,7 +87,7 @@ class Links extends Component {
         const { name, phone} = this.state
         const passenger_info = {name:name, phone: phone}
 
-        await api.passenger_info(passenger_info) 
+        await api.passenger_login(passenger_info) 
 
         this.setState({ passenger_flag: false, driver_flag: true })
     }

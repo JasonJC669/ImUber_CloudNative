@@ -5,7 +5,7 @@ const api = axios.create({
 })
 
 export const driver_login = driver_info => api.post(`login/driver`, driver_info)
-export const passenger_login = driver_info => api.post(`/login/passenger`, driver_info)
+export const passenger_login = passenger_info => api.post(`/login/passenger`, passenger_info)
 
 export const insertMovie = payload => api.post(`/movie`, payload)
 export const getAllMovies = () => api.get(`/movies`)

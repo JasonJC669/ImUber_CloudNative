@@ -75,19 +75,19 @@ class Links extends Component {
     }
 
     Driver_Login = async () => {
-        const { name, phone} = this.state
-        const driver_info = {name:name, phone: phone}
+        const { name, phone } = this.state
+        const driver_info = { name: name, phone: phone }
 
-        await api.driver_login(driver_info) 
+        await api.driver_login(driver_info)
 
         this.setState({ passenger_flag: false, driver_flag: true })
     }
 
     Passenger_Login = async () => {
-        const { name, phone} = this.state
-        const passenger_info = {name:name, phone: phone}
+        const { name, phone } = this.state
+        const passenger_info = { name: name, phone: phone }
 
-        await api.passenger_login(passenger_info) 
+        await api.passenger_login(passenger_info)
 
         this.setState({ passenger_flag: false, driver_flag: true })
     }
@@ -137,6 +137,7 @@ class Links extends Component {
                             variant="standard"
                             value={name}
                             onChange={this.handle_Input_name}
+                            sx={{ margin: "auto 10px auto auto" }}
                         />
                         <TextField
                             id="standard-search"
@@ -145,6 +146,7 @@ class Links extends Component {
                             variant="standard"
                             value={phone}
                             onChange={this.handle_Input_phone}
+                            sx={{ margin: "auto 10px auto auto" }}
                         />
                         <Button onClick={this.Login}>登入</Button>
                     </div>

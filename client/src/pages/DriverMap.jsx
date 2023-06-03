@@ -287,10 +287,14 @@ class DriverMap extends Component {
   }
 
   render() {
-    const { containerStyle, center, zoom, changeToPassenger, libraries } = this.state
+    const { containerStyle, center, zoom, changeToPassenger, libraries, openGroupFlag } = this.state
 
     if (changeToPassenger)
       return <Redirect to="/passenger" />;
+
+    if (openGroupFlag) {
+      return <Redirect to="/driver/group" />;
+    }
 
     return (
       <LoadScript

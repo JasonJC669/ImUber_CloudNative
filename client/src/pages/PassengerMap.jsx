@@ -40,20 +40,19 @@ const ADDbottom = styled.div`
 
 class ADD extends Component {
   AddUser = event => {
-      event.preventDefault()
-
-      if (
-          window.confirm(
-              `Do tou want to add the trip ${this.props.id} ?`,
-          )
-      ) {
-          api.UesrJoinTeam(this.props.id)
-          window.location.reload()
-      }
+    event.preventDefault()
+    if (
+      window.confirm(
+        `Do tou want to add the trip ${this.props.id} ?`,
+      )
+    ) {
+      api.UesrJoinTeam(this.props.id)
+      window.location.reload()
+    }
   }
 
   render() {
-      return <ADDbottom onClick={this.AddUser}>ADD</ADDbottom>
+    return <ADDbottom onClick={this.AddUser}>ADD</ADDbottom>
   }
 }
 
@@ -89,47 +88,45 @@ class PassengerMap extends Component {
     const longitude = event.latLng.lng();
     console.log(latitude, longitude);
 
-    const place = {latitude, longitude}
+    const place = { latitude, longitude }
 
-    api.createPlace(place).then(response => {
-      console.log(response);
-    })
-    .catch(error => {
-      console.error(error);
-    });
+    // api.createPlace(place).then(response => {
+    //   console.log(response);
+    // })
+    //   .catch(error => {
+    //     console.error(error);
+    //   });
   };
 
-  
+  // componentDidMount = async () => { //是React中的一個函數當組件被放置到網頁上時它會自動被調用
+  //   this.setState({ isLoading: true })
 
-  componentDidMount = async () => { //是React中的一個函數當組件被放置到網頁上時它會自動被調用
-    this.setState({ isLoading: true })
-
-    await api.getAllDriver().then(driver => {
-        this.setState({
-            driver: driver.data.data,
-            isLoading: false,
-        })
-    })
-}
+  //   await api.getAllDriver().then(driver => {
+  //     this.setState({
+  //       driver: driver.data.data,
+  //       isLoading: false,
+  //     })
+  //   })
+  // }
 
   render() {
     const { libraries, containerStyle, center, zoom, driver, isLoading } = this.state
 
     const columns = [
       {
-          Header: 'Driver ID',
-          accessor: '_id',
-          filterable: true,
+        Header: 'Driver ID',
+        accessor: '_id',
+        filterable: true,
       },
       {
-          Header: 'Start',
-          accessor: 'start',
-          filterable: true,
+        Header: 'Start',
+        accessor: 'start',
+        filterable: true,
       },
       {
-          Header: 'End',
-          accessor: 'end',
-          filterable: true,
+        Header: 'End',
+        accessor: 'end',
+        filterable: true,
       },
       {
         Header: 'Seats',
@@ -139,14 +136,14 @@ class PassengerMap extends Component {
       {
         Header: '',
         accessor: '',
-        Cell: function(props) {
-            return (
-                <span>
-                    <ADD id={props.original._id} />
-                </span>
-            )
+        Cell: function (props) {
+          return (
+            <span>
+              <ADD id={props.original._id} />
+            </span>
+          )
         },
-    },
+      },
     ]
 
     let showTable = true
@@ -155,65 +152,65 @@ class PassengerMap extends Component {
     // }
 
     return (
-    <>
-      <OverlayTable>
-        {showTable && (
-          <ReactTable
+      <>
+        <OverlayTable>
+          {showTable && (
+            <ReactTable
               data={driver}
               columns={columns}
               loading={isLoading}
               defaultPageSize={10}
               showPageSizeOptions={true}
               minRows={0}
-          />
-        )}
-      </OverlayTable>
-
-
-
-      <LoadScript
-        googleMapsApiKey={API_KEY}
-        libraries={libraries}
-      >
-        <Paper
-          component="form"
-          sx={{ p: '2px 4px', display: 'flex', alignItems: 'center', width: 500, position: 'fixed', top: '10px', left: '10px', zIndex: 1 }}
-        >
-          <Autocomplete
-            onLoad={this.onLoad}
-            onPlaceChanged={this.onPlaceChanged}
-          >
-            <InputBase
-              sx={{ ml: 1, flex: 1, width: 500 }}
-              placeholder="Search Google Maps"
-              inputProps={{ 'aria-label': 'search google maps' }}
             />
-          </Autocomplete>
-          {/* <IconButton type="button" sx={{ p: '10px', }} aria-label="add">
+          )}
+        </OverlayTable>
+
+
+
+        <LoadScript
+          googleMapsApiKey={API_KEY}
+          libraries={libraries}
+        >
+          <Paper
+            component="form"
+            sx={{ p: '2px 4px', display: 'flex', alignItems: 'center', width: 500, position: 'fixed', top: '10px', left: '10px', zIndex: 1 }}
+          >
+            <Autocomplete
+              onLoad={this.onLoad}
+              onPlaceChanged={this.onPlaceChanged}
+            >
+              <InputBase
+                sx={{ ml: 1, flex: 1, width: 500 }}
+                placeholder="Search Google Maps"
+                inputProps={{ 'aria-label': 'search google maps' }}
+              />
+            </Autocomplete>
+            {/* <IconButton type="button" sx={{ p: '10px', }} aria-label="add">
             <AddIcon />
           </IconButton> */}
-        </Paper>
+          </Paper>
 
 
 
-        <GoogleMap
-          mapContainerStyle={containerStyle}
-          center={center}
-          zoom={zoom}
-          onZoomChanged={this.onZoomChanged}
+          <GoogleMap
+            mapContainerStyle={containerStyle}
+            center={center}
+            zoom={zoom}
+            onZoomChanged={this.onZoomChanged}
 
-          options={{ //一些輔助功能不要出現
-            zoomControl: false,
-            streetViewControl: false,
-            mapTypeControl: false,
-            fullscreenControl: false,
-          }}
+            options={{ //一些輔助功能不要出現
+              zoomControl: false,
+              streetViewControl: false,
+              mapTypeControl: false,
+              fullscreenControl: false,
+            }}
 
-          onClick={this.handleMapClick} //傳送經緯度
-        >
-        </GoogleMap>
-      </LoadScript>
-    </>
+            onClick={this.handleMapClick} //傳送經緯度
+          >
+          </GoogleMap>
+        </LoadScript>
+      </>
     )
   }
 }

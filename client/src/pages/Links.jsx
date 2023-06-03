@@ -1,10 +1,12 @@
 import React, { Component } from 'react'
 import styled from 'styled-components'
-import backgroundImage from '../public/first.png'
-// eslint-disable-next-line
 import { Redirect } from 'react-router-dom';
 
+import backgroundImage from '../public/first.png'
+// eslint-disable-next-line
 import api from '../api'
+
+import TextField from '@mui/material/TextField';
 
 const Container = styled.div`
     display: flex;
@@ -37,12 +39,6 @@ const Label = styled.label`
     margin: 5px;
 `
 
-const InputText = styled.input.attrs({
-    className: 'form-control',
-})`
-    margin: 5px;
-`
-
 const Button = styled.button.attrs({
     className: `btn btn-primary`,
 })`
@@ -56,14 +52,14 @@ class Links extends Component {
         this.state = {
             ID: 'Max',
             chose_User_type: false,
-            driver_flag: false,
             passenger_flag: false,
+            driver_flag: false,
         }
     }
 
     handle_Input_ID = async event => {
         const ID = event.target.value
-        this.setState({ ID })
+        this.setState({ ID: ID })
     }
 
     Login = async () => {
@@ -72,22 +68,22 @@ class Links extends Component {
     }
 
     Driver_Login = async () => {
-        const { ID } = this.state
-        const Driver_ID = { ID }
-        await api.Driver_login(Driver_ID)
-        // window.alert(`Driver login successfully`)
-        this.setState({ ID: ID, driver_flag: true })
+        this.setState({ passenger_flag: false, driver_flag: true })
     }
 
     Passenger_Login = async () => {
-        this.setState({ passenger_flag: true })
+        this.setState({ passenger_flag: true, driver_flag: false })
     }
 
     render() {
-        const { ID, chose_User_type, passenger_flag } = this.state
+        const { ID, chose_User_type, passenger_flag, driver_flag } = this.state
 
         if (passenger_flag) {
             return <Redirect to="/passenger" />;
+        }
+
+        if (driver_flag) {
+            return <Redirect to="/driver" />;
         }
 
         if (chose_User_type) {
@@ -110,12 +106,23 @@ class Links extends Component {
                 <Wrapper>
                     <Title>Welcome to ImUber</Title>
                     <Label>Please enter your name: </Label>
-                    <InputText
-                        type="text"
-                        value={ID}
-                        onChange={this.handle_Input_ID}
-                    />
-                    <Button onClick={this.Login}>登入</Button>
+                    <div style={{
+                        margin: "auto 30px auto 30px",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        height: "100%"
+                    }}>
+                        <TextField
+                            id="standard-search"
+                            label="Name"
+                            type="search"
+                            variant="standard"
+                            value={ID}
+                            onChange={this.handle_Input_ID}
+                        />
+                        <Button onClick={this.Login}>登入</Button>
+                    </div>
                 </Wrapper>
             </Container>
         )

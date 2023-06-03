@@ -1,7 +1,7 @@
 import React from 'react'
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom'
 
-import { Links, PassengerMap, DriverMap } from '../pages'
+import { Links, PassengerMap, DriverMap, DriverGroup } from '../pages'
 
 import 'bootstrap/dist/css/bootstrap.min.css'
 
@@ -12,6 +12,7 @@ function App() {
                 <Route path="/" exact component={Links} />
                 <Route path="/passenger" exact component={PassengerMap} />
                 <Route path="/driver" exact component={DriverMap} />
+                <Route path="/driver/group" exact component={DriverGroup} />
             </Switch>
         </Router>
     )

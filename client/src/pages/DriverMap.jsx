@@ -55,6 +55,7 @@ class DriverMap extends Component {
   constructor(props) {
     super(props)
     this.state = {
+      ID: 'Max', // TODO: get ID form other class
       containerStyle: {
         width: '100vw',
         height: '100vh'
@@ -125,7 +126,7 @@ class DriverMap extends Component {
                 {place.name ? place.name : "Unknown Place"}
               </Item>
             ))}
-            <Button variant="contained">開團(名稱待決定)</Button>
+            <Button variant="contained" onClick={this.openRoute}>開團(名稱待決定)</Button>
           </Stack>
         </Paper>
       );
@@ -266,6 +267,23 @@ class DriverMap extends Component {
       )
     }
     return null;
+  }
+
+  openRoute = () => {
+    const { ID, places } = this.state
+    if (ID === '') {
+      window.alert(`No ID!!!`)
+      return
+    }
+    if (places.length < 2) {
+      window.alert(`At least 2 places needed`)
+      return
+    }
+
+    // Call api
+
+    window.alert(`Open Group Successful`)
+    return
   }
 
   render() {

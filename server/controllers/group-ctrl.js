@@ -115,9 +115,9 @@ joinGroup = async (req, res) => {
     // const Dname = req.body.Dname
     // const Dphone = req.body.Dphone
     // const Dplaces = req.body.places
-
-    const Pname = "FAN"
-    const Pphone = "0930090502"
+    console.log(req.body)
+    const Pname = "Max"
+    const Pphone = "0900000000"
     const Dname = "Max"
     const Dphone = "0900000000"
     
@@ -134,56 +134,46 @@ joinGroup = async (req, res) => {
         },
       ];
     
-    console.log(req.body)
+    // console.log(req.body)
     if (!req.body) {
         return res.status(400).json({
             success: false,
             error: 'You must provide driver phone and group places',
         })
     }
-    await DriverDB.findOne({phone: Dphone}, (err, driver_exist) =>{
-        if (err) {
-            console.log("[g-ctrl-join] get driver error")
-            console.log(err)
-            return res.status(400).json({
-                success: false,
-                error: err
-            })
-        }
-        else if (driver_exist) {
-            driver_exist.places = Dplaces
-            driver_exist.save()
-            .then(() => {
-                console.log("[g-ctrl-create] save group success")
-                console.log(driver_exist)
-                return res.status(201).json({
-                    success: true,
-                    id: driver_exist._id,
-                    data: driver_exist,
-                    message: 'group created success',
-                })
-            })
-            .catch(error => {
-                console.log("[g-ctrl-create] create group failed")
-                console.log(error)
-                return res.status(400).json({
-                    success: true,
-                    error: error,
-                    message: 'group created faild',
-                })
-            })
-        }
-        else{
-            console.log("[g-ctrl-create] driver not exist")
-            // console.log(driver_exist)
+    try {
+        const driver_exist = await DriverDB.findOne({ phone: Dphone }).exec();
+        if (!driver_exist) {
+            console.log("[g-ctrl-join] driver not exist");
             return res.status(400).json({
                 error: 'driver not exist',
                 message: 'driver not exist',
-            })
+            });
         }
-    })
+    
+        const pass_exist = await PassengerDB.findOne({ phone: Pphone }).exec();
+        if (!pass_exist) {
+            console.log("[g-ctrl-join] passenger not exist");
+            return res.status(400).json({
+                error: 'passenger not exist',
+                message: 'passenger not exist',
+            });
+        }
+    
+        console.log(driver_exist);
+        console.log(pass_exist);
+        
+    } catch (error) {
+        console.log("[g-ctrl-join] error", error);
+        return res.status(400).json({
+            success: false,
+            error: error.message,
+        });
+    }
+
 }
 module.exports = {
     createGroup,
     getGroup,
+    joinGroup,
 }

@@ -2,19 +2,21 @@ const DriverDB = require('../models/driver-model')
 
 createGroup = async (req, res) => {
     const Dname = "Max"
-    const Dphone = "0900000000"
-    const Dplaces = [
-        {
-          name: 'Place 1',
-          latitude: 123.456,
-          longitude: 78.9,
-        },
-        {
-          name: 'Place 2',
-          latitude: 12.345,
-          longitude: 67.89,
-        },
-      ];
+    // const Dphone = "0900000000"
+    const Dphone = res.body.phone
+    const Dplaces = res.body.places
+    // const Dplaces = [
+    //     {
+    //       name: 'Place 1',
+    //       latitude: 123.456,
+    //       longitude: 78.9,
+    //     },
+    //     {
+    //       name: 'Place 2',
+    //       latitude: 12.345,
+    //       longitude: 67.89,
+    //     },
+    //   ];
     console.log(Dphone)
     if (!req.body) {
         return res.status(400).json({

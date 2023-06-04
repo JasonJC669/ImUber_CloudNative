@@ -67,7 +67,7 @@ class DriverGroup extends Component {
     this.directionsCallback = this.directionsCallback.bind(this)
   }
 
-  componentDidMount = async () => {
+  componentDidMount = () => {
     const { name, phone } = this.state
     const payload = {
       name: name,
@@ -75,7 +75,8 @@ class DriverGroup extends Component {
     }
     this.setState({ isLoading: true })
 
-    await api.get_group_driver(payload).then(res => {
+    console.log('Sending payload: ', payload)
+    api.get_group_driver(payload).then(res => {
       this.setState({
         places: res.places,
         isLoading: false,

@@ -55,7 +55,8 @@ class DriverMap extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      ID: 'Max', // TODO: get ID form other class
+      name: 'Max', // TODO: get ID form other class
+      phone: '0912123456',
       containerStyle: {
         width: '100vw',
         height: '100vh'
@@ -271,9 +272,9 @@ class DriverMap extends Component {
   }
 
   openRoute = () => {
-    const { ID, places } = this.state
-    if (ID === '') {
-      window.alert(`No ID!!!`)
+    const { name, phone, places } = this.state
+    if (name === '' || phone === '') {
+      window.alert(`No name or no phone`)
       return
     }
     if (places.length < 2) {
@@ -282,9 +283,12 @@ class DriverMap extends Component {
     }
 
     // Call api
+    const payload = { phone: phone, places: places }
+    api.create_group_driver(payload).then(res => {
+      window.alert(`Open Group Successful`)
+      this.setState({ openGroupFlag: true })
+    })
 
-    this.setState({ openGroupFlag: true })
-    window.alert(`Open Group Successful`)
     return
   }
 

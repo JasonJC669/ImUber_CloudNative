@@ -61,9 +61,26 @@ class DriverGroup extends Component {
       ],
       response: null,
       renderDirectionsFlag: true,
+      isLoading: false,
     }
 
     this.directionsCallback = this.directionsCallback.bind(this)
+  }
+
+  componentDidMount = async () => {
+    const { name, phone } = this.state
+    const payload = {
+      name: name,
+      phone: phone,
+    }
+    this.setState({ isLoading: true })
+
+    await api.get_group_driver(payload).then(res => {
+      this.setState({
+        places: res.places,
+        isLoading: false,
+      })
+    })
   }
 
   renderPlaceList = () => {

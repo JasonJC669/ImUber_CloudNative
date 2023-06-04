@@ -26,8 +26,8 @@ class DriverGroup extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      name: 'Max', // TODO: get name form other class
-      phone: '0900000000',
+      name: '',
+      phone: '',
       containerStyle: {
         width: '100vw',
         height: '100vh'
@@ -37,30 +37,31 @@ class DriverGroup extends Component {
         lng: 121.03022793405411
       },
       zoom: 8,
-      places: [
-        {
-          name: 'NYCU',
-          latitude: 24.787100467155234,
-          longitude: 120.9975076255494
-        },
-        {
-          name: 'NTHU',
-          latitude: 24.79629699245621,
-          longitude: 120.99660552369998
-        },
-        {
-          name: 'Costco',
-          latitude: 24.793388745733505,
-          longitude: 121.01338658303233
-        },
-        {
-          name: 'Shopee',
-          latitude: 24.782057378055566,
-          longitude: 121.01150308586197
-        },
-      ],
+      places: [],
+      // places: [
+      //   {
+      //     name: 'NYCU',
+      //     latitude: 24.787100467155234,
+      //     longitude: 120.9975076255494
+      //   },
+      //   {
+      //     name: 'NTHU',
+      //     latitude: 24.79629699245621,
+      //     longitude: 120.99660552369998
+      //   },
+      //   {
+      //     name: 'Costco',
+      //     latitude: 24.793388745733505,
+      //     longitude: 121.01338658303233
+      //   },
+      //   {
+      //     name: 'Shopee',
+      //     latitude: 24.782057378055566,
+      //     longitude: 121.01150308586197
+      //   },
+      // ],
       response: null,
-      renderDirectionsFlag: true,
+      renderDirectionsFlag: false,
       isLoading: false,
     }
 
@@ -68,6 +69,22 @@ class DriverGroup extends Component {
   }
 
   componentDidMount = () => {
+    const { state } = this.props.location
+    if (state && state.Dname && state.Dphone) {
+      const { Dname, Dphone } = state
+      this.setState({ name: Dname, phone: Dphone }, () => {
+        console.log('[DEBUG]-DriverGroup.jsx this.state.name ', this.state.name)
+      })
+    }
+    else {
+      console.log('[DEBUG]-DriverGroup.jsx No name & phone from DriverMap. Set to default.')
+      this.setState({ name: 'Max', phone: '0900000000' }, () => {
+        this.getPlaceList();
+      })
+    }
+  }
+
+  getPlaceList = () => {
     const { name, phone } = this.state
     const payload = {
       name: name,
@@ -75,12 +92,14 @@ class DriverGroup extends Component {
     }
     this.setState({ isLoading: true })
 
-    console.log('Sending payload: ', payload)
+    console.log('[DEBUG]-DriverGroup.jsx Sending payload: ', payload)
     api.get_group_driver(payload).then(res => {
       this.setState({
         places: res.places,
         isLoading: false,
+        renderDirectionsFlag: true,
       })
+      console.log("[DEBUG]-DriverGroup.jsx places: ", this.state.places)
     })
   }
 

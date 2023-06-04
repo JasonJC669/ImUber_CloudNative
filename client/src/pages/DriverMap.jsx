@@ -83,14 +83,18 @@ class DriverMap extends Component {
   }
 
   componentDidMount = () => {
-    const { Dname, Dphone } = this.props.location.state;
-    const { name, phone } = this.state;
-
-    this.setState({ name: Dname, phone: Dphone }, () => {
-      console.log('[DEBUG] this.state.name ', this.state.name)
-    })
+    const { state } = this.props.location
+    if (state && state.Dname && state.Dphone) {
+      const { Dname, Dphone } = state
+      this.setState({ name: Dname, phone: Dphone }, () => {
+        console.log('[DEBUG]-DriverMap.jsx this.state.name ', this.state.name)
+      })
+    }
+    else {
+      console.log('[DEBUG]-DriverMap.jsx No name & phone from Links. Set to default.')
+      this.setState({ name: 'Max', phone: '0900000000' })
+    }
   }
-
 
   onLoad(autocomplete) {
     // console.log('[info] autocomplete: ', autocomplete)
@@ -299,13 +303,16 @@ class DriverMap extends Component {
   }
 
   render() {
-    const { containerStyle, center, zoom, changeToPassenger, libraries, openGroupFlag } = this.state
+    const { containerStyle, center, zoom, changeToPassenger, libraries, openGroupFlag, name, phone } = this.state
 
     if (changeToPassenger)
       return <Redirect to="/passenger" />;
 
     if (openGroupFlag) {
-      return <Redirect to="/driver/group" />;
+      return <Redirect to={{
+        pathname: "/driver/group",
+        state: { Dname: name, Dphone: phone },
+      }} />;
     }
 
     return (

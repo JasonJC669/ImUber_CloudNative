@@ -25,7 +25,7 @@ createGroup = async (req, res) => {
             error: 'You must provide driver phone and group places',
         })
     }
-    await DriverDB.findOne({phone: Dphone}, (err, driver_exist) =>{
+    await DriverDB.findOne({ phone: Dphone }, (err, driver_exist) => {
         if (err) {
             console.log("[g-ctrl-create] get driver error")
             console.log(err)
@@ -37,27 +37,27 @@ createGroup = async (req, res) => {
         else if (driver_exist) {
             driver_exist.places = Dplaces
             driver_exist.save()
-            .then(() => {
-                console.log("[g-ctrl-create] save group success")
-                console.log(driver_exist)
-                return res.status(201).json({
-                    success: true,
-                    id: driver_exist._id,
-                    data: driver_exist,
-                    message: 'group created success',
+                .then(() => {
+                    console.log("[g-ctrl-create] save group success")
+                    console.log(driver_exist)
+                    return res.status(201).json({
+                        success: true,
+                        id: driver_exist._id,
+                        data: driver_exist,
+                        message: 'group created success',
+                    })
                 })
-            })
-            .catch(error => {
-                console.log("[g-ctrl-create] create group failed")
-                console.log(error)
-                return res.status(400).json({
-                    success: true,
-                    error: error,
-                    message: 'group created faild',
+                .catch(error => {
+                    console.log("[g-ctrl-create] create group failed")
+                    console.log(error)
+                    return res.status(400).json({
+                        success: true,
+                        error: error,
+                        message: 'group created faild',
+                    })
                 })
-            })
         }
-        else{
+        else {
             console.log("[g-ctrl-create] driver not exist")
             // console.log(driver_exist)
             return res.status(400).json({
@@ -78,7 +78,7 @@ getGroup = async (req, res) => {
             error: 'You must provide driver phone',
         })
     }
-    await DriverDB.findOne({phone: Dphone, name: Dname}, (err, driver_exist) =>{
+    await DriverDB.findOne({ phone: Dphone, name: Dname }, (err, driver_exist) => {
         if (err) {
             console.log("[g-ctrl-get] get driver error")
             console.log(err)
@@ -88,17 +88,17 @@ getGroup = async (req, res) => {
             })
         }
         else if (driver_exist) {
-            
-                console.log("[g-ctrl-get] get group success")
-                console.log(driver_exist)
-                return res.status(201).json({
-                    success: true,
-                    id: driver_exist._id,
-                    data: driver_exist,
-                    message: 'get group success',
-                })
+
+            console.log("[g-ctrl-get] get group success")
+            console.log(driver_exist)
+            return res.status(201).json({
+                success: true,
+                id: driver_exist._id,
+                data: driver_exist,
+                message: 'get group success',
+            })
         }
-        else{
+        else {
             console.log("[g-ctrl-get] greoup not exist")
             // console.log(driver_exist)
             return res.status(400).json({

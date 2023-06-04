@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 // eslint-disable-next-line
-import { Redirect } from 'react-router-dom';
+import { Redirect, useLocation } from 'react-router-dom';
 // eslint-disable-next-line
 import api from '../api'
 
@@ -55,7 +55,8 @@ class DriverMap extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      ID: 'Max', // TODO: get ID form other class
+      name: '',
+      phone: '',
       containerStyle: {
         width: '100vw',
         height: '100vh'
@@ -70,6 +71,7 @@ class DriverMap extends Component {
       places: [],
       responses: [],
       renderDirectionsFlag: false,
+      openGroupFlag: false,
     }
     this.autocomplete = null
     this.onLoad = this.onLoad.bind(this)
@@ -80,8 +82,18 @@ class DriverMap extends Component {
     this.directionsCallback = this.directionsCallback.bind(this)
   }
 
+  componentDidMount = () => {
+    const { Dname, Dphone } = this.props.location.state;
+    const { name, phone } = this.state;
+
+    this.setState({ name: Dname, phone: Dphone }, () => {
+      console.log('[DEBUG] this.state.name ', this.state.name)
+    })
+  }
+
+
   onLoad(autocomplete) {
-    console.log('autocomplete: ', autocomplete)
+    // console.log('[info] autocomplete: ', autocomplete)
     this.autocomplete = autocomplete
   }
 
@@ -91,19 +103,18 @@ class DriverMap extends Component {
       if (place && place.geometry && place.geometry.location) {
         const { lat, lng } = place.geometry.location;
         this.handlePlaceAdd(place);
-        console.log('Place Latitude:', lat());
-        console.log('Place Longitude:', lng());
       };
     } else {
-      console.log('Autocomplete is not loaded yet!')
+      console.log('[info] Autocomplete is not loaded yet!')
     }
   }
 
   handlePlaceAdd = (place_ele) => {
     const { places } = this.state;
     const updatedPlaces = [...places, place_ele];
-    this.setState({ places: updatedPlaces, renderDirectionsFlag: true });
-    console.log('places: ', places);
+    this.setState({ places: updatedPlaces, renderDirectionsFlag: true }, () => {
+      console.log('[DEBUG] this.state.places: ', this.state.places);
+    })
   }
 
   handleInputKeyPress = (event) => {
@@ -114,7 +125,6 @@ class DriverMap extends Component {
 
   renderPlaceList = () => {
     const { places } = this.state;
-    console.log("places.length = " + places.length)
     if (places.length > 0) {
       return (
         <Paper
@@ -123,7 +133,7 @@ class DriverMap extends Component {
           <Stack spacing={1}>
             {places.map((place, index) => (
               <Item key={index}>
-                {place.name ? place.name : "Unknown Place"}
+                {place.name ? place.name : "[ERROR] Unknown Place"}
               </Item>
             ))}
             <Button variant="contained" onClick={this.openRoute}>開團(名稱待決定)</Button>
@@ -170,7 +180,7 @@ class DriverMap extends Component {
   directionsCallback(response) {
     const { responses } = this.state;
     const updatedResponses = [...responses, response];
-    console.log('directionsCallback response: ', response)
+    console.log('[info] directionsCallback response: ', response)
     if (response !== null) {
       if (response.status === 'OK') {
         this.setState({
@@ -178,14 +188,13 @@ class DriverMap extends Component {
           responses: updatedResponses,
         })
       } else {
-        console.log('response: ', response)
+        console.log('[DEBUG] response: ', response)
       }
     }
   }
 
   callDirectionsService = () => {
     const { places, renderDirectionsFlag } = this.state;
-    console.log('Called callDirectionsService()');
     if (places.length > 1 && renderDirectionsFlag) {
       return (
         <>
@@ -211,13 +220,13 @@ class DriverMap extends Component {
                     callback={this.directionsCallback}
                     onLoad={(directionsService) => {
                       console.log(
-                        'DirectionsService onLoad directionsService: ',
+                        '[info] DirectionsService onLoad directionsService: ',
                         directionsService
                       );
                     }}
                     onUnmount={(directionsService) => {
                       console.log(
-                        'DirectionsService onUnmount directionsService: ',
+                        '[info] DirectionsService onUnmount directionsService: ',
                         directionsService
                       );
                     }}
@@ -235,7 +244,6 @@ class DriverMap extends Component {
 
   renderDirections = () => {
     const { responses } = this.state;
-    console.log('responses: ', responses)
     if (responses.length > 0) {
       return (
         <>
@@ -249,13 +257,13 @@ class DriverMap extends Component {
                   }}
                   onLoad={(directionsRenderer) => {
                     console.log(
-                      'DirectionsRenderer onLoad directionsRenderer: ',
+                      '[info] DirectionsRenderer onLoad directionsRenderer: ',
                       directionsRenderer
                     );
                   }}
                   onUnmount={(directionsRenderer) => {
                     console.log(
-                      'DirectionsRenderer onUnmount directionsRenderer: ',
+                      '[info] DirectionsRenderer onUnmount directionsRenderer: ',
                       directionsRenderer
                     );
                   }}
@@ -270,9 +278,9 @@ class DriverMap extends Component {
   }
 
   openRoute = () => {
-    const { ID, places } = this.state
-    if (ID === '') {
-      window.alert(`No ID!!!`)
+    const { name, phone, places } = this.state
+    if (name === '' || phone === '') {
+      window.alert(`No name or no phone`)
       return
     }
     if (places.length < 2) {
@@ -281,16 +289,24 @@ class DriverMap extends Component {
     }
 
     // Call api
+    const payload = { phone: phone, places: places }
+    api.create_group_driver(payload).then(res => {
+      window.alert(`Open Group Successful`)
+      this.setState({ openGroupFlag: true })
+    })
 
-    window.alert(`Open Group Successful`)
     return
   }
 
   render() {
-    const { containerStyle, center, zoom, changeToPassenger, libraries } = this.state
+    const { containerStyle, center, zoom, changeToPassenger, libraries, openGroupFlag } = this.state
 
     if (changeToPassenger)
       return <Redirect to="/passenger" />;
+
+    if (openGroupFlag) {
+      return <Redirect to="/driver/group" />;
+    }
 
     return (
       <LoadScript

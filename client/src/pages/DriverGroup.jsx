@@ -193,6 +193,27 @@ class DriverGroup extends Component {
     )
   }
 
+  renderPlaceList = () => {
+    const { places } = this.state;
+    console.log("places.length = " + places.length)
+    if (places.length > 0) {
+      return (
+        <Paper
+          sx={{ p: '2px 4px', display: 'flex', alignItems: 'center', height: 'auto', width: 400, position: 'fixed', top: '10px', left: '10px', zIndex: 1 }}
+        >
+          <Stack spacing={1}>
+            {places.map((place, index) => (
+              <Item key={index}>
+                {place.name ? place.name : "Unknown Place"}
+              </Item>
+            ))}
+          </Stack>
+        </Paper>
+      );
+    }
+    return null;
+  }
+
   render() {
     const { containerStyle, center, zoom } = this.state
 

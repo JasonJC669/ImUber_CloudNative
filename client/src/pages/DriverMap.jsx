@@ -105,7 +105,6 @@ class DriverMap extends Component {
     if (this.autocomplete !== null) {
       const place = this.autocomplete.getPlace();
       if (place && place.geometry && place.geometry.location) {
-        const { lat, lng } = place.geometry.location;
         this.handlePlaceAdd(place);
       };
     } else {
@@ -292,8 +291,13 @@ class DriverMap extends Component {
       return
     }
 
-    // Call api
-    const payload = { phone: phone, places: places }
+    const payload_places = places.map(place => ({
+      name: place.name,
+      latitude: place.geometry.location.lat(),
+      longitude: place.geometry.location.lng(),
+    }))
+
+    const payload = { phone: phone, places: payload_places }
     api.create_group_driver(payload).then(res => {
       window.alert(`Open Group Successful`)
       this.setState({ openGroupFlag: true })

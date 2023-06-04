@@ -74,6 +74,7 @@ class DriverGroup extends Component {
       const { Dname, Dphone } = state
       this.setState({ name: Dname, phone: Dphone }, () => {
         console.log('[DEBUG]-DriverGroup.jsx this.state.name ', this.state.name)
+        this.getPlaceList()
       })
     }
     else {
@@ -84,7 +85,7 @@ class DriverGroup extends Component {
     }
   }
 
-  getPlaceList = () => {
+  getPlaceList = async () => {
     const { name, phone } = this.state
     const payload = {
       name: name,
@@ -93,13 +94,14 @@ class DriverGroup extends Component {
     this.setState({ isLoading: true })
 
     console.log('[DEBUG]-DriverGroup.jsx Sending payload: ', payload)
-    api.get_group_driver(payload).then(res => {
+    await api.get_group_driver(payload).then(res => {
+      console.log("[DEBUG]-DriverGroup.jsx Get from api res.data: ", res.data)
+      console.log("[DEBUG]-DriverGroup.jsx res.data.data.places: ", res.data.data.places)
       this.setState({
-        places: res.places,
+        places: res.data.data.places,
         isLoading: false,
         renderDirectionsFlag: true,
       })
-      console.log("[DEBUG]-DriverGroup.jsx places: ", this.state.places)
     })
   }
 
@@ -123,38 +125,6 @@ class DriverGroup extends Component {
     return null;
   }
 
-  markerOnLoad = (marker, place_ele) => {
-    this.setState({
-      center:
-      {
-        lat: place_ele.latitude,
-        lng: place_ele.longitude,
-      },
-      zoom: 15,
-    })
-  }
-
-  renderPlaceMarker = () => {
-    const { places } = this.state;
-    if (places.length > 0) {
-      return (
-        <>
-          {places.map((place, index) => (
-            <Marker
-              key={index}
-              onLoad={(marker) => this.markerOnLoad(marker, place)}
-              position={{
-                lat: place.latitude,
-                lng: place.longitude,
-              }}
-            />
-          ))}
-        </>
-      )
-    }
-    return null;
-  }
-
   directionsCallback(response) {
     console.log(response)
     if (response !== null) {
@@ -172,39 +142,30 @@ class DriverGroup extends Component {
   callDirectionsService = () => {
     const { places, renderDirectionsFlag } = this.state;
     if (renderDirectionsFlag) {
+      const tmp = places.map(place => ({
+        location: {
+          lat: place.latitude,
+          lng: place.longitude,
+        }
+      }))
+      const waypoints = tmp.slice(1, -1)
+      const origin = tmp[0]
+      const destination = tmp[tmp.length - 1]
+
       return (
         <DirectionsService
           options={{
-            destination: {
-              lat: places[1].latitude,
-              lng: places[1].longitude,
-            },
-            origin: {
-              lat: places[0].latitude,
-              lng: places[0].longitude,
-            },
-            waypoints: [
-              {
-                location: {
-                  lat: places[2].latitude,
-                  lng: places[2].longitude,
-                },
-              },
-              {
-                location: {
-                  lat: places[3].latitude,
-                  lng: places[3].longitude,
-                },
-              },
-            ],
+            destination: destination,
+            origin: origin,
+            waypoints: waypoints,
             travelMode: 'DRIVING',
           }}
           callback={this.directionsCallback}
           onLoad={directionsService => {
-            console.log('DirectionsService onLoad directionsService: ', directionsService)
+            console.log('[info] DirectionsService onLoad directionsService: ', directionsService)
           }}
           onUnmount={directionsService => {
-            console.log('DirectionsService onUnmount directionsService: ', directionsService)
+            console.log('[info] DirectionsService onUnmount directionsService: ', directionsService)
           }}
         />
       )
@@ -221,10 +182,10 @@ class DriverGroup extends Component {
               directions: this.state.response
             }}
             onLoad={directionsRenderer => {
-              console.log('DirectionsRenderer onLoad directionsRenderer: ', directionsRenderer)
+              console.log('[info] DirectionsRenderer onLoad directionsRenderer: ', directionsRenderer)
             }}
             onUnmount={directionsRenderer => {
-              console.log('DirectionsRenderer onUnmount directionsRenderer: ', directionsRenderer)
+              console.log('[info] DirectionsRenderer onUnmount directionsRenderer: ', directionsRenderer)
             }}
           />
         )}

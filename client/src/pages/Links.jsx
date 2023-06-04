@@ -100,7 +100,10 @@ class Links extends Component {
         }
 
         if (driver_flag) {
-            return <Redirect to="/driver" />;
+            return <Redirect to={{
+                pathname: "/driver",
+                state: { Dname: name, Dphone: phone },
+            }} />;
         }
 
         if (chose_User_type) {

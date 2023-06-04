@@ -36,7 +36,7 @@ addDriver = async (req, res) => {
             else{
                 driver_new.save()
                 .then(() => {
-                    console.log("[d-ctrl-add] save driver success")
+                    console.log("[d-ctrl-add] create driver success")
                     return res.status(201).json({
                         success: true,
                         id: driver_new._id,
@@ -45,7 +45,7 @@ addDriver = async (req, res) => {
                     })
                 })
                 .catch(error => {
-                    console.log("[d-ctrl-add] save driver failed")
+                    console.log("[d-ctrl-add] create driver failed")
                     console.log(error)
                     return res.status(400).json({
                         success: true,
@@ -66,7 +66,7 @@ addDriver = async (req, res) => {
                 })
             }
             else{
-                console.log("[d-ctrl-add] driver phone number already exist ", driver_exist.name)
+                console.log("[d-ctrl-add] driver (" , driver_exist.name, ") phone number already exist")
                 // console.log(driver_exist)
                 return res.status(400).json({
                     error: 'driver phone number already exist',

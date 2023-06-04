@@ -8,10 +8,23 @@ const Driver = new Schema(
         phone: { type: String, required: true },
 
         time: [String],
-        route: { type: [{String, Decimal128, Decimal128}] },
-        
-        passengerNumber: { type: Number, required: false, min: 0, max: 4 },
-        passengerPhone: { type: [String], required: false },
+        // route: { type: [{String, Decimal128, Decimal128}] },
+        places: [
+            {
+                name: { type: String },
+                latitude: { type: Number },
+                longitude: { type: Number },
+            },
+
+        ],
+        passenger: [
+            {
+                name: { type: String },
+                phone: { type: String },
+            },
+        ],
+        // passengerNumber: { type: Number, required: false, min: 0, max: 4 },
+        // passengerPhone: { type: [String], required: false },
     },
     { timestamps: true },
 )

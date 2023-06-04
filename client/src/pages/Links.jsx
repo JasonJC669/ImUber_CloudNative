@@ -89,7 +89,7 @@ class Links extends Component {
 
         await api.passenger_login(passenger_info)
 
-        this.setState({ passenger_flag: false, driver_flag: true })
+        this.setState({ passenger_flag: true, driver_flag: false })
     }
 
     render() {

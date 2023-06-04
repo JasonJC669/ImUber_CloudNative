@@ -173,7 +173,7 @@ class PassengerMap extends Component {
           libraries={libraries}
         >
           <Paper
-            component="form"
+            component="div"
             sx={{ p: '2px 4px', display: 'flex', alignItems: 'center', width: 500, position: 'fixed', top: '10px', left: '10px', zIndex: 1 }}
           >
             <Autocomplete

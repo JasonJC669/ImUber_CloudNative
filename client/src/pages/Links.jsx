@@ -94,7 +94,10 @@ class Links extends Component {
         const { name, phone, chose_User_type, passenger_flag, driver_flag } = this.state
 
         if (passenger_flag) {
-            return <Redirect to="/passenger" />;
+            return <Redirect to={{
+                pathname: "/passenger",
+                state: { Pname: name, Pphone: phone },
+            }} />;
         }
 
         if (driver_flag) {

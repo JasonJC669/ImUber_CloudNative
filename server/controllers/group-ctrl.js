@@ -191,6 +191,7 @@ joinGroup = async (req, res) => {
                 .then(() => {
                     console.log("[g-ctrl-join] driver save success");
                 })
+            
             console.log("===========")
             console.log("===========")
             console.log("driverData: ", driverData)
@@ -199,7 +200,12 @@ joinGroup = async (req, res) => {
             console.log("pass_exist2: ", pass_exist2.driver)
             console.log("===========")
             console.log("===========")
-            
+            return res.status(201).json({
+                success: true,
+                id: driver_exist._id,
+                data: driver_exist,
+                message: 'join group success',
+            })
             // pass_exist.dirver.name = driver_exist.name
             // pass_exist.dirver.phone = driver_exist.phone
 
@@ -252,12 +258,31 @@ getNearGroups = async (req, res) => {
     console.log("Plat: ", Plat)
     console.log("Plon: ", Plon)
     // const place = req.body.name
+    // var newgroup = {
+    //         driver_name: { type: String},
+    //         driver_phone: { type: String},
     
-    const place = {
-        name: 'Place 1',
-          latitude: 123.451,
-          longitude: 78.3,
-    }
+    //         time: [{ type: String}],
+    //         places: [
+    //             {
+    //                 name: { type: String },
+    //                 latitude: { type: Number },
+    //                 longitude: { type: Number },
+    //             },
+    
+    //         ],
+    //         passenger: [
+    //             {
+    //                 name: { type: String },
+    //                 phone: { type: String },
+    //             },
+    //         ],
+    //     }
+    // const place = {
+    //     name: 'Place 1',
+    //       latitude: 123.451,
+    //       longitude: 78.3,
+    // }
     try{
         const filteredGroups = [];
         const groups = await DriverDB.find({}).exec();
@@ -292,6 +317,17 @@ getNearGroups = async (req, res) => {
         }
         if(filteredGroups.length > 0){
             console.log("[g-ctrl-getNear] find near group success");
+            // const filteredGroups_changeName = [];
+            // for (let i = 0; i < filteredGroups.length; i++) {
+                // newgroup.driver_name = filteredGroups[i].name
+                // newgroup.driver_phone = filteredGroups[i].phone
+                // newgroup.time = filteredGroups[i].time
+                // newgroup.places = filteredGroups[i].places
+                // newgroup.passenger = filteredGroups[i].passenger
+                // filteredGroups_changeName.push(newgroup)
+                // console.log("filteredGroups: ", i, filteredGroups[i]);
+                // console.log("filteredGroups_changeName: ", i, filteredGroups_changeName[i]);
+            // }
             return res.status(201).json({
                 success: true,
                 data: filteredGroups,

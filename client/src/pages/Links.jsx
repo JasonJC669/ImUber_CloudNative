@@ -20,8 +20,6 @@ const Container = styled.div`
     padding: 0;
 `
 
-
-
 const Wrapper = styled.div`
     margin: 0 30px;
     background-color: white;

@@ -278,11 +278,11 @@ getNearGroups = async (req, res) => {
     //             },
     //         ],
     //     }
-    const place = {
-        name: 'Place 1',
-          latitude: 123.451,
-          longitude: 78.3,
-    }
+    // const place = {
+    //     name: 'Place 1',
+    //       latitude: 123.451,
+    //       longitude: 78.3,
+    // }
     try{
         const filteredGroups = [];
         const groups = await DriverDB.find({}).exec();

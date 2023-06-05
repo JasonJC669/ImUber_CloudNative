@@ -87,11 +87,11 @@ getGroup = async (req, res) => {
             })
         }
         else {
-            console.log("[g-ctrl-get] greoup not exist")
+            console.log("[g-ctrl-get] group not exist")
             // console.log(driver_exist)
             return res.status(400).json({
-                error: 'greoup not exist',
-                message: 'greoup not exist',
+                error: 'group not exist',
+                message: 'group not exist',
             })
         }
     })
@@ -153,11 +153,20 @@ joinGroup = async (req, res) => {
 
         console.log(driver_exist);
         console.log(pass_exist);
-        if(driver_exist.places.length > 4){
-            console.log("[g-ctrl-join] no seat");
+        for (let i = 0; i < driver_exist.passenger.length; i++) {
+            if(driver_exist.passenger.phone == pass_exist.phone){
+                console.log("[g-ctrl-join] passenger already join group");
+                return res.status(400).json({
+                    error: 'passenger already join group ',
+                    message: 'passenger already join group',
+                });
+            }
+        }
+        if(driver_exist.passenger.length >= 4){
+            console.log("[g-ctrl-join] group no seat");
             return res.status(400).json({
-                error: 'no seat',
-                message: 'no seat',
+                error: 'group no seat',
+                message: 'group no seat',
             });
         }
         else if(pass_exist.dirver){

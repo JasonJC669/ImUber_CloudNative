@@ -283,7 +283,7 @@ getNearGroups = async (req, res) => {
         for (let i = 0; i < groups.length; i++) {
             // console.log("gorup: ", i, groups[i]);
             if(groups[i].places.length > 0){
-                for (let j = 0; j < groups[i].places.length - 1; j++) {
+                for (let j = 0; j < groups[i].places.length; j++) {
                     console.log("dis:", calculateDistance(Plat, Plon,
                         groups[i].places[j].latitude,
                         groups[i].places[j].longitude));

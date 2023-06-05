@@ -7,7 +7,12 @@ const router = express.Router()
 
 router.post('/login/passenger', PassengerCtrl.addPassenger)
 router.post('/login/driver', DriverCtrl.addDriver)
+// router.post('/login/driver', GroupCtrl.createGroup)
 // router.post('/login/driver', GroupCtrl.joinGroup)
+// router.post('/login/driver', GroupCtrl.getNearGroups)
+
+
+router.post('/group/getNear', GroupCtrl.getNearGroups)
 router.post('/group/creat', GroupCtrl.createGroup)
 router.post('/group/get', GroupCtrl.getGroup)
 // router.put('/movie/:id', MovieCtrl.updateMovie)

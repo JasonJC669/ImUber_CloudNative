@@ -26,8 +26,8 @@ class DriverGroup extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      name: 'Max', // TODO: get name form other class
-      phone: '0900000000',
+      name: '',
+      phone: '',
       containerStyle: {
         width: '100vw',
         height: '100vh'
@@ -37,30 +37,31 @@ class DriverGroup extends Component {
         lng: 121.03022793405411
       },
       zoom: 8,
-      places: [
-        {
-          name: 'NYCU',
-          latitude: 24.787100467155234,
-          longitude: 120.9975076255494
-        },
-        {
-          name: 'NTHU',
-          latitude: 24.79629699245621,
-          longitude: 120.99660552369998
-        },
-        {
-          name: 'Costco',
-          latitude: 24.793388745733505,
-          longitude: 121.01338658303233
-        },
-        {
-          name: 'Shopee',
-          latitude: 24.782057378055566,
-          longitude: 121.01150308586197
-        },
-      ],
+      places: [],
+      // places: [
+      //   {
+      //     name: 'NYCU',
+      //     latitude: 24.787100467155234,
+      //     longitude: 120.9975076255494
+      //   },
+      //   {
+      //     name: 'NTHU',
+      //     latitude: 24.79629699245621,
+      //     longitude: 120.99660552369998
+      //   },
+      //   {
+      //     name: 'Costco',
+      //     latitude: 24.793388745733505,
+      //     longitude: 121.01338658303233
+      //   },
+      //   {
+      //     name: 'Shopee',
+      //     latitude: 24.782057378055566,
+      //     longitude: 121.01150308586197
+      //   },
+      // ],
       response: null,
-      renderDirectionsFlag: true,
+      renderDirectionsFlag: false,
       isLoading: false,
     }
 
@@ -68,6 +69,23 @@ class DriverGroup extends Component {
   }
 
   componentDidMount = () => {
+    const { state } = this.props.location
+    if (state && state.Dname && state.Dphone) {
+      const { Dname, Dphone } = state
+      this.setState({ name: Dname, phone: Dphone }, () => {
+        console.log('[DEBUG]-DriverGroup.jsx this.state.name ', this.state.name)
+        this.getPlaceList()
+      })
+    }
+    else {
+      console.log('[DEBUG]-DriverGroup.jsx No name & phone from DriverMap. Set to default.')
+      this.setState({ name: 'Max', phone: '0900000000' }, () => {
+        this.getPlaceList();
+      })
+    }
+  }
+
+  getPlaceList = async () => {
     const { name, phone } = this.state
     const payload = {
       name: name,
@@ -75,11 +93,14 @@ class DriverGroup extends Component {
     }
     this.setState({ isLoading: true })
 
-    console.log('Sending payload: ', payload)
-    api.get_group_driver(payload).then(res => {
+    console.log('[DEBUG]-DriverGroup.jsx Sending payload: ', payload)
+    await api.get_group_driver(payload).then(res => {
+      console.log("[DEBUG]-DriverGroup.jsx Get from api res.data: ", res.data)
+      console.log("[DEBUG]-DriverGroup.jsx res.data.data.places: ", res.data.data.places)
       this.setState({
-        places: res.places,
+        places: res.data.data.places,
         isLoading: false,
+        renderDirectionsFlag: true,
       })
     })
   }
@@ -104,38 +125,6 @@ class DriverGroup extends Component {
     return null;
   }
 
-  markerOnLoad = (marker, place_ele) => {
-    this.setState({
-      center:
-      {
-        lat: place_ele.latitude,
-        lng: place_ele.longitude,
-      },
-      zoom: 15,
-    })
-  }
-
-  renderPlaceMarker = () => {
-    const { places } = this.state;
-    if (places.length > 0) {
-      return (
-        <>
-          {places.map((place, index) => (
-            <Marker
-              key={index}
-              onLoad={(marker) => this.markerOnLoad(marker, place)}
-              position={{
-                lat: place.latitude,
-                lng: place.longitude,
-              }}
-            />
-          ))}
-        </>
-      )
-    }
-    return null;
-  }
-
   directionsCallback(response) {
     console.log(response)
     if (response !== null) {
@@ -153,39 +142,30 @@ class DriverGroup extends Component {
   callDirectionsService = () => {
     const { places, renderDirectionsFlag } = this.state;
     if (renderDirectionsFlag) {
+      const tmp = places.map(place => ({
+        location: {
+          lat: place.latitude,
+          lng: place.longitude,
+        }
+      }))
+      const waypoints = tmp.slice(1, -1)
+      const origin = tmp[0]
+      const destination = tmp[tmp.length - 1]
+
       return (
         <DirectionsService
           options={{
-            destination: {
-              lat: places[1].latitude,
-              lng: places[1].longitude,
-            },
-            origin: {
-              lat: places[0].latitude,
-              lng: places[0].longitude,
-            },
-            waypoints: [
-              {
-                location: {
-                  lat: places[2].latitude,
-                  lng: places[2].longitude,
-                },
-              },
-              {
-                location: {
-                  lat: places[3].latitude,
-                  lng: places[3].longitude,
-                },
-              },
-            ],
+            destination: destination,
+            origin: origin,
+            waypoints: waypoints,
             travelMode: 'DRIVING',
           }}
           callback={this.directionsCallback}
           onLoad={directionsService => {
-            console.log('DirectionsService onLoad directionsService: ', directionsService)
+            console.log('[info] DirectionsService onLoad directionsService: ', directionsService)
           }}
           onUnmount={directionsService => {
-            console.log('DirectionsService onUnmount directionsService: ', directionsService)
+            console.log('[info] DirectionsService onUnmount directionsService: ', directionsService)
           }}
         />
       )
@@ -202,15 +182,36 @@ class DriverGroup extends Component {
               directions: this.state.response
             }}
             onLoad={directionsRenderer => {
-              console.log('DirectionsRenderer onLoad directionsRenderer: ', directionsRenderer)
+              console.log('[info] DirectionsRenderer onLoad directionsRenderer: ', directionsRenderer)
             }}
             onUnmount={directionsRenderer => {
-              console.log('DirectionsRenderer onUnmount directionsRenderer: ', directionsRenderer)
+              console.log('[info] DirectionsRenderer onUnmount directionsRenderer: ', directionsRenderer)
             }}
           />
         )}
       </>
     )
+  }
+
+  renderPlaceList = () => {
+    const { places } = this.state;
+    console.log("places.length = " + places.length)
+    if (places.length > 0) {
+      return (
+        <Paper
+          sx={{ p: '2px 4px', display: 'flex', alignItems: 'center', height: 'auto', width: 400, position: 'fixed', top: '10px', left: '10px', zIndex: 1 }}
+        >
+          <Stack spacing={1}>
+            {places.map((place, index) => (
+              <Item key={index}>
+                {place.name ? place.name : "Unknown Place"}
+              </Item>
+            ))}
+          </Stack>
+        </Paper>
+      );
+    }
+    return null;
   }
 
   render() {

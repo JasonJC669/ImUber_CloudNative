@@ -3,18 +3,6 @@ const PassengerDB = require('../models/passenger-model')
 createGroup = async (req, res) => {
     // const Dname = "Max"
     // const Dphone = "0900000000"
-    // const Dplaces = [
-    //     {
-    //       name: 'Place 1',
-    //       latitude: 123.456,
-    //       longitude: 78.9,
-    //     },
-    //     {
-    //       name: 'Place 2',
-    //       latitude: 12.345,
-    //       longitude: 67.89,
-    //     },
-    //   ];
     const Dphone = req.body.phone
     const Dplaces = req.body.places
     console.log("body: ", req.body)
@@ -115,6 +103,7 @@ joinGroup = async (req, res) => {
     // const Dname = req.body.Dname
     const Dphone = req.body.Dphone
     // const Dplaces = req.body.places
+
     console.log("body: ", req.body)
     console.log("Pphone: ", Pphone)
     console.log("Dphone: ", Dphone)
@@ -135,7 +124,7 @@ joinGroup = async (req, res) => {
     //       longitude: 67.89,
     //     },
     //   ];
-    
+  
     // console.log(req.body)
     if (!req.body) {
         return res.status(400).json({
@@ -152,7 +141,7 @@ joinGroup = async (req, res) => {
                 message: 'driver not exist',
             });
         }
-    
+
         const pass_exist = await PassengerDB.findOne({ phone: Pphone }).exec();
         if (!pass_exist) {
             console.log("[g-ctrl-join] passenger not exist");
@@ -161,6 +150,7 @@ joinGroup = async (req, res) => {
                 message: 'passenger not exist',
             });
         }
+
         console.log(driver_exist);
         console.log(pass_exist);
         if(driver_exist.places.length > 4){

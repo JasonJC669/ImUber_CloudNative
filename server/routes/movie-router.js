@@ -6,10 +6,10 @@ const GroupCtrl = require('../controllers/group-ctrl')
 const router = express.Router()
 
 router.post('/login/passenger', PassengerCtrl.addPassenger)
-// router.post('/login/driver', DriverCtrl.addDriver)
+router.post('/login/driver', DriverCtrl.addDriver)
 // router.post('/login/driver', GroupCtrl.createGroup)
 // router.post('/login/driver', GroupCtrl.joinGroup)
-router.post('/login/driver', GroupCtrl.getNearGroups)
+// router.post('/login/driver', GroupCtrl.getNearGroups)
 
 
 router.post('/group/getNear', GroupCtrl.getNearGroups)

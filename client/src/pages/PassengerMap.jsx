@@ -68,86 +68,11 @@ class PassengerMap extends Component {
       },
       zoom: 8,
       libraries: ['places'],
-      driver_route_list: [
-        {
-          name: 'Jason',
-          places: [
-            {
-              name: '國立陽明交通大學',
-              latitude: 24.7868862,
-              longitude: 120.9974969
-            },
-            {
-              name: '國立清華大學',
-              latitude: 24.7961217,
-              longitude: 120.9966699
-            },
-          ]
-        },
-        {
-          name: 'Max',
-          places: [
-            {
-              name: '國立陽明交通大學',
-              latitude: 24.7868862,
-              longitude: 120.9974969
-            },
-            {
-              name: '國立清華大學',
-              latitude: 24.7961217,
-              longitude: 120.9966699
-            },
-          ]
-        },
-        {
-          name: 'Hsin',
-          places: [
-            {
-              name: '國立陽明交通大學',
-              latitude: 24.7868862,
-              longitude: 120.9974969
-            },
-            {
-              name: '國立清華大學',
-              latitude: 24.7961217,
-              longitude: 120.9966699
-            },
-          ]
-        },
-        {
-          name: 'Fan',
-          places: [
-            {
-              name: '國立陽明交通大學',
-              latitude: 24.7868862,
-              longitude: 120.9974969
-            },
-            {
-              name: '國立清華大學',
-              latitude: 24.7961217,
-              longitude: 120.9966699
-            },
-          ]
-        },
-        {
-          name: 'David',
-          places: [
-            {
-              name: '國立陽明交通大學',
-              latitude: 24.7868862,
-              longitude: 120.9974969
-            },
-            {
-              name: '國立清華大學',
-              latitude: 24.7961217,
-              longitude: 120.9966699
-            },
-          ]
-        },
-      ],
+      driver_route_list: [],
       render_route_index: -1,
       response: null,
       renderDirectionsFlag: false,
+      addRouteFlag: false,
     }
     this.autocomplete = null
     this.onLoad = this.onLoad.bind(this)
@@ -208,7 +133,6 @@ class PassengerMap extends Component {
 
   callDirectionsService = () => {
     const { driver_route_list, renderDirectionsFlag, render_route_index } = this.state;
-    console.log('[DEBUG] render_route_index: ', render_route_index)
     if (renderDirectionsFlag) {
       const tmp = driver_route_list[render_route_index].places.map(place => ({
         location: {
@@ -267,9 +191,23 @@ class PassengerMap extends Component {
   }
 
   addRoute = (props) => {
+    const { name, phone } = this.state
     if (window.confirm(`Do you want to add the trip that ${props.original.Dname} drive from ${props.original.start} to ${props.original.end}`)) {
-      console.log('[info] joining group')
-      // api.UesrJoinTeam(this.props.id)
+      const payload = {
+        Dphone: props.original.Dphone,
+        Pname: name,
+        Pphone: phone,
+      }
+      api.add_routes_passenger(payload).then(res => {
+        console.log("[DEBUG]-PassengerMap.jsx Get from api res.data: ", res.data)
+        if (res.data.message === 'join group success') {
+          window.alert(`Join Group Successful`)
+          this.setState({ addRouteFlag: true })
+        }
+        else {
+          window.alert(`Join Group FAIL`)
+        }
+      })
     }
   }
 
@@ -282,15 +220,6 @@ class PassengerMap extends Component {
     const latitude = event.latLng.lat();
     const longitude = event.latLng.lng();
     console.log(latitude, longitude);
-
-    const place = { latitude, longitude }
-
-    // api.createPlace(place).then(response => {
-    //   console.log(response);
-    // })
-    //   .catch(error => {
-    //     console.error(error);
-    //   });
   };
 
   componentDidMount = () => {
@@ -308,11 +237,18 @@ class PassengerMap extends Component {
   }
 
   render() {
-    const { libraries, containerStyle, center, zoom, isLoading, driver_route_list } = this.state
+    const { libraries, containerStyle, center, zoom, isLoading, driver_route_list, name, phone, addRouteFlag } = this.state
 
-    console.log('driver_route_list: ', driver_route_list);
+    if (addRouteFlag) {
+      return <Redirect to={{
+        pathname: "/passenger/group",
+        state: { Pname: name, Pphone: phone },
+      }} />;
+    }
+
     const routes = driver_route_list.map(driver_route => ({
       Dname: driver_route.name,
+      Dphone: driver_route.phone,
       start: driver_route.places[0].name,
       end: driver_route.places[driver_route.places.length - 1].name,
       seats: 3,
@@ -343,7 +279,7 @@ class PassengerMap extends Component {
         Header: '',
         accessor: '',
         Cell: (props) => {
-          console.log('[DEBUG] props: ', props)
+          // console.log('[DEBUG] props: ', props)
           return (
             <Button variant="contained" onClick={() => this.showRoute(props.index)}>Show</Button>
           )
@@ -353,7 +289,7 @@ class PassengerMap extends Component {
         Header: '',
         accessor: '',
         Cell: (props) => {
-          console.log('[DEBUG] props: ', props)
+          // console.log('[DEBUG] props: ', props)
           return (
             <Button variant="contained" onClick={() => this.addRoute(props)}>Add</Button>
           )
@@ -362,9 +298,9 @@ class PassengerMap extends Component {
     ]
 
     let showTable = true
-    // if (!driver.length) {
-    //     showTable = false
-    // }
+    if (!routes.length) {
+      showTable = false
+    }
 
     return (
       <>

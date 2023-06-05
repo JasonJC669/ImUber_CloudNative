@@ -159,10 +159,65 @@ joinGroup = async (req, res) => {
                 message: 'passenger not exist',
             });
         }
-    
         console.log(driver_exist);
         console.log(pass_exist);
-        
+        if(driver_exist.places.length > 4){
+            console.log("[g-ctrl-join] no seat");
+            return res.status(400).json({
+                error: 'no seat',
+                message: 'no seat',
+            });
+        }
+        else if(pass_exist.dirver){
+            console.log("[g-ctrl-join] passenger already join a group");
+            return res.status(400).json({
+                error: 'passenger already join a group',
+                message: 'passenger already join a group',
+            });
+        }
+        else {
+            driver_exist.passenger.concat({name: Pname, phone: Pphone})
+            const driverData ={
+                name: { type: String },
+                phone: { type: String},
+            }
+            driverData.name = driver_exist.name
+            driverData.phone = driver_exist.phone
+            PassengerDB.updateOne({ _id: pass_exist._id }, { driver: driverData })
+                .then(() => {
+                console.log("Driver updated for the passenger successfully.");
+                })
+                .catch(error => {
+                console.error("Error updating driver for the passenger:", error);
+                });
+            // pass_exist.set('driver', {
+            //     name: driver_exist.name,
+            //     phone: driver_exist.phone,
+            // });
+            const pass_exist2 = await PassengerDB.findOne({  _id: pass_exist._id }).exec();
+            driver_exist.save()
+                .then(() => {
+                    console.log("[g-ctrl-join] driver save success");
+                })
+            console.log("===========")
+            console.log("===========")
+            console.log("driverData: ", driverData)
+            console.log("driver_exist.name: ", driver_exist.name)
+            console.log("driver_exist.phone: ", driver_exist.phone)
+            console.log("pass_exist2: ", pass_exist2.driver)
+            console.log("===========")
+            console.log("===========")
+            
+            // pass_exist.dirver.name = driver_exist.name
+            // pass_exist.dirver.phone = driver_exist.phone
+
+            
+            // pass_exist.save()
+            // .then(() => {
+            //     console.log("[g-ctrl-join] passenger save success");
+            // })
+        }
+
     } catch (error) {
         console.log("[g-ctrl-join] error", error);
         return res.status(400).json({
@@ -170,7 +225,7 @@ joinGroup = async (req, res) => {
             error: error.message,
         });
     }
-
+    
 }
 module.exports = {
     createGroup,

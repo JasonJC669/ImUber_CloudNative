@@ -7,7 +7,7 @@ const Driver = new Schema(
         name: { type: String, required: true },
         phone: { type: String, required: true },
 
-        time: [String],
+        time: [{ type: String}],
         // route: { type: [{String, Decimal128, Decimal128}] },
         places: [
             {

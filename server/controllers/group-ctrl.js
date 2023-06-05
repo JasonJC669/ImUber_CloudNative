@@ -1,24 +1,24 @@
 const DriverDB = require('../models/driver-model')
 const PassengerDB = require('../models/passenger-model')
 createGroup = async (req, res) => {
-    const Dname = "Max"
-    const Dphone = "0900000000"
-    // const Dphone = req.body.phone
-    // const Dplaces = req.body.places
-    const Dplaces = [
-        {
-          name: 'Place 1',
-          latitude: 123.456,
-          longitude: 78.9,
-        },
-        {
-          name: 'Place 2',
-          latitude: 12.345,
-          longitude: 67.89,
-        },
-      ];
+    // const Dname = "Max"
+    // const Dphone = "0900000000"
+    // const Dplaces = [
+    //     {
+    //       name: 'Place 1',
+    //       latitude: 123.456,
+    //       longitude: 78.9,
+    //     },
+    //     {
+    //       name: 'Place 2',
+    //       latitude: 12.345,
+    //       longitude: 67.89,
+    //     },
+    //   ];
+    const Dphone = req.body.phone
+    const Dplaces = req.body.places
     console.log("body: ", req.body)
-    console.log(Dphone)
+    console.log("Dphone: ", Dphone)
     if (!req.body) {
         return res.status(400).json({
             success: false,
@@ -68,17 +68,17 @@ createGroup = async (req, res) => {
     })
 }
 getGroup = async (req, res) => {
-    const Dname = req.body.name
+    // const Dname = req.body.name
     const Dphone = req.body.phone
     console.log("body: ", req.body)
-    console.log(Dphone)
+    console.log("Dphone", Dphone)
     if (!req.body) {
         return res.status(400).json({
             success: false,
             error: 'You must provide driver phone',
         })
     }
-    await DriverDB.findOne({ phone: Dphone, name: Dname }, (err, driver_exist) => {
+    await DriverDB.findOne({ phone: Dphone }, (err, driver_exist) => {
         if (err) {
             console.log("[g-ctrl-get] get driver error")
             console.log(err)
@@ -111,28 +111,30 @@ getGroup = async (req, res) => {
 
 joinGroup = async (req, res) => {
     // const Pname = req.body.Pname
-    // const Pphone = req.body.Pphone
+    const Pphone = req.body.Pphone
     // const Dname = req.body.Dname
-    // const Dphone = req.body.Dphone
+    const Dphone = req.body.Dphone
     // const Dplaces = req.body.places
-    console.log(req.body)
-    const Pname = "Max"
-    const Pphone = "0900000000"
-    const Dname = "Max"
-    const Dphone = "0900000000"
+    console.log("body: ", req.body)
+    console.log("Pphone: ", Pphone)
+    console.log("Dphone: ", Dphone)
+    // const Pname = "Max"
+    // const Pphone = "0900000000"
+    // const Dname = "Max"
+    // const Dphone = "0900000000"
     
-    const Dplaces = [
-        {
-          name: 'Place 1',
-          latitude: 123.456,
-          longitude: 78.9,
-        },
-        {
-          name: 'Place 2',
-          latitude: 12.345,
-          longitude: 67.89,
-        },
-      ];
+    // const Dplaces = [
+    //     {
+    //       name: 'Place 1',
+    //       latitude: 123.456,
+    //       longitude: 78.9,
+    //     },
+    //     {
+    //       name: 'Place 2',
+    //       latitude: 12.345,
+    //       longitude: 67.89,
+    //     },
+    //   ];
     
     // console.log(req.body)
     if (!req.body) {
@@ -176,7 +178,7 @@ joinGroup = async (req, res) => {
             });
         }
         else {
-            driver_exist.passenger.concat({name: Pname, phone: Pphone})
+            driver_exist.passenger.concat({name: pass_exist.name, phone: pass_exist.phone})
             const driverData ={
                 name: { type: String },
                 phone: { type: String},
@@ -227,8 +229,110 @@ joinGroup = async (req, res) => {
     }
     
 }
+function calculateDistance(lat1, lon1, lat2, lon2) {
+    const radLat1 = toRadians(lat1);
+    const radLon1 = toRadians(lon1);
+    const radLat2 = toRadians(lat2);
+    const radLon2 = toRadians(lon2);
+  
+    const dLon = radLon2 - radLon1;
+    const dLat = radLat2 - radLat1;
+    const a =
+      Math.sin(dLat / 2) ** 2 +
+      Math.cos(radLat1) * Math.cos(radLat2) * Math.sin(dLon / 2) ** 2;
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    const distance = 6371 * c;
+  
+    return distance;
+    }
+  
+function toRadians(degrees) {
+    return degrees * (Math.PI / 180);
+    }
+
+getNearGroups = async (req, res) => {
+    
+    // const Pname = req.body.name
+    // const Pphone = req.body.phone
+    const Plat = req.body.latitude
+    const Plon = req.body.longitude
+    // const Plat = 123.456
+    // const Plon = 78.9
+    console.log("body: ", req.body)
+    console.log("Plat: ", Plat)
+    console.log("Plon: ", Plon)
+    // const place = req.body.name
+    
+    const place = {
+        name: 'Place 1',
+          latitude: 123.451,
+          longitude: 78.3,
+    }
+    try{
+        const filteredGroups = [];
+        const groups = await DriverDB.find({}).exec();
+        if(groups.length == 0){
+            console.log("[g-ctrl-getNear] there is no driver in DB");
+            return res.status(400).json({
+                success: false,
+                error: 'there is no driver DB',
+                message: 'there is no driver DB'
+            })
+        }
+        // console.log("groups length: ", groups.length);
+        for (let i = 0; i < groups.length; i++) {
+            // console.log("gorup: ", i, groups[i]);
+            if(groups[i].places.length > 0){
+                for (let j = 0; j < groups[i].places.length - 1; j++) {
+                    console.log("dis:", calculateDistance(Plat, Plon,
+                        groups[i].places[j].latitude,
+                        groups[i].places[j].longitude));
+                    if(calculateDistance(Plat, Plon,
+                        groups[i].places[j].latitude,
+                        groups[i].places[j].longitude) <= 1){
+                            console.log("====== [FIND] =====");
+                            console.log("groups: ", groups[i]);
+                            filteredGroups.push(groups[i])
+                            break;
+                    
+                    }
+
+                }
+            }
+        }
+        if(filteredGroups.length > 0){
+            console.log("[g-ctrl-getNear] find near group success");
+            return res.status(201).json({
+                success: true,
+                data: filteredGroups,
+                message: 'find near group success',
+            })
+        }
+        else{
+            console.log("[g-ctrl-getNear] find near group failed");
+            return res.status(400).json({
+                success: false,
+                error: "find near group failed",
+                message: "find near group failed"
+            })
+        }
+        // console.log("====== [DEBUG] =====");
+        // console.log("== filteredGroups ==");
+        // console.log("====================");
+        // for (let i = 0; i < filteredGroups.length; i++) {
+        //     console.log("filteredGroups: ", i, filteredGroups[i]);
+        // }
+    } catch (error) {
+        console.log("[g-ctrl-getNear] error", error);
+    }
+    // const distance = calculateDistance(25.0478, 121.5318, 40.7128, -74.0060);
+    // console.log("distance", distance);
+
+}
+
 module.exports = {
     createGroup,
     getGroup,
     joinGroup,
+    getNearGroups,
 }

@@ -5,8 +5,8 @@ createGroup = async (req, res) => {
     // const Dphone = "0900000000"
     const Dphone = req.body.phone
     const Dplaces = req.body.places
-    console.log("body: ", req.body)
-    console.log("Dphone: ", Dphone)
+    console.log("[g-ctrl-create] body: ", req.body)
+    console.log("[g-ctrl-create] Dphone: ", Dphone)
     if (!req.body) {
         return res.status(400).json({
             success: false,
@@ -58,8 +58,8 @@ createGroup = async (req, res) => {
 getGroup = async (req, res) => {
     // const Dname = req.body.name
     const Dphone = req.body.phone
-    console.log("body: ", req.body)
-    console.log("Dphone", Dphone)
+    console.log("[g-ctrl-get] body: ", req.body)
+    console.log("[g-ctrl-get] Dphone", Dphone)
     if (!req.body) {
         return res.status(400).json({
             success: false,
@@ -87,14 +87,56 @@ getGroup = async (req, res) => {
             })
         }
         else {
-            console.log("[g-ctrl-get] greoup not exist")
+            console.log("[g-ctrl-get] group not exist")
             // console.log(driver_exist)
             return res.status(400).json({
-                error: 'greoup not exist',
-                message: 'greoup not exist',
+                error: 'group not exist',
+                message: 'group not exist',
             })
         }
     })
+}
+passengerGetGroup = async (req, res) => {
+    // const Dname = req.body.name
+    const Pphone = req.body.phone
+    console.log("[g-ctrl-passGetGroup] body: ", req.body)
+    console.log("[g-ctrl-passGetGroup] Pphone", Pphone)
+    if (!req.body) {
+        return res.status(400).json({
+            success: false,
+            error: 'You must provide passenger phone',
+        })
+    }
+    try{
+        const pass_exist = await PassengerDB.findOne({ phone: Pphone }).exec();
+        if (!pass_exist) {
+            console.log("[g-ctrl-passGetGroup] passenger not exist");
+            return res.status(400).json({
+                error: 'passenger not exist',
+                message: 'passenger not exist',
+            });
+        }
+        const driver_exist = await DriverDB.findOne({ phone: pass_exist.driver.phone }).exec();
+        if (!driver_exist) {
+            console.log("[g-ctrl-passGetGroup] passenger not join a group");
+            return res.status(400).json({
+                error: 'passenger not join a group',
+                message: 'passenger not join a group',
+            });
+        }
+        else{
+            console.log("[g-ctrl-passGetGroup] passenger get group success")
+            return res.status(201).json({
+                success: true,
+                id: driver_exist._id,
+                data: driver_exist,
+                message: 'passenger get group success',
+            })
+        }
+    
+    }catch (error) {
+        console.log("[g-ctrl-passGetGroup] error", error);
+    }
 }
 
 joinGroup = async (req, res) => {
@@ -104,9 +146,9 @@ joinGroup = async (req, res) => {
     const Dphone = req.body.Dphone
     // const Dplaces = req.body.places
 
-    console.log("body: ", req.body)
-    console.log("Pphone: ", Pphone)
-    console.log("Dphone: ", Dphone)
+    console.log("[g-ctrl-join] body: ", req.body)
+    console.log("[g-ctrl-join] Pphone: ", Pphone)
+    console.log("[g-ctrl-join] Dphone: ", Dphone)
     // const Pname = "Max"
     // const Pphone = "0900000000"
     // const Dname = "Max"
@@ -153,11 +195,20 @@ joinGroup = async (req, res) => {
 
         console.log(driver_exist);
         console.log(pass_exist);
-        if(driver_exist.places.length > 4){
-            console.log("[g-ctrl-join] no seat");
+        for (let i = 0; i < driver_exist.passenger.length; i++) {
+            if(driver_exist.passenger.phone == pass_exist.phone){
+                console.log("[g-ctrl-join] passenger already join group");
+                return res.status(400).json({
+                    error: 'passenger already join group ',
+                    message: 'passenger already join group',
+                });
+            }
+        }
+        if(driver_exist.passenger.length >= 4){
+            console.log("[g-ctrl-join] group no seat");
             return res.status(400).json({
-                error: 'no seat',
-                message: 'no seat',
+                error: 'group no seat',
+                message: 'group no seat',
             });
         }
         else if(pass_exist.dirver){
@@ -361,4 +412,5 @@ module.exports = {
     getGroup,
     joinGroup,
     getNearGroups,
+    passengerGetGroup,
 }

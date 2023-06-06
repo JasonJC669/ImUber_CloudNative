@@ -10,7 +10,7 @@ router.post('/login/driver', DriverCtrl.addDriver)
 // router.post('/login/driver', GroupCtrl.createGroup)
 // router.post('/login/driver', GroupCtrl.joinGroup)
 // router.post('/login/driver', GroupCtrl.getNearGroups)
-
+// router.post('/login/driver', GroupCtrl.passengerGetGroup)
 
 router.post('/group/getNear', GroupCtrl.getNearGroups)
 router.post('/group/creat', GroupCtrl.createGroup)

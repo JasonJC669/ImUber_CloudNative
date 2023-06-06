@@ -110,7 +110,8 @@ class Links extends Component {
                 this.setState({ passenger_flag: true, driver_flag: false })
             }
             else {
-                this.setState({ join_group_passenger_flag: true })
+                this.setState({ passenger_flag: true, driver_flag: false })
+                // this.setState({ join_group_passenger_flag: true })
             }
         })
     }

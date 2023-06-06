@@ -14,7 +14,16 @@ const Item = styled(Paper)(({ theme }) => ({
   padding: theme.spacing(1),
   textAlign: 'center',
   color: theme.palette.text.secondary,
-  width: '380px',
+  width: '390px',
+}));
+
+const PassengerItem = styled(Paper)(({ theme }) => ({
+  backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
+  ...theme.typography.body2,
+  padding: theme.spacing(1),
+  textAlign: 'center',
+  color: theme.palette.text.secondary,
+  width: '200px',
 }));
 
 class DriverGroup extends Component {
@@ -33,28 +42,14 @@ class DriverGroup extends Component {
       },
       zoom: 8,
       places: [],
-      // places: [
-      //   {
-      //     name: 'NYCU',
-      //     latitude: 24.787100467155234,
-      //     longitude: 120.9975076255494
-      //   },
-      //   {
-      //     name: 'NTHU',
-      //     latitude: 24.79629699245621,
-      //     longitude: 120.99660552369998
-      //   },
-      //   {
-      //     name: 'Costco',
-      //     latitude: 24.793388745733505,
-      //     longitude: 121.01338658303233
-      //   },
-      //   {
-      //     name: 'Shopee',
-      //     latitude: 24.782057378055566,
-      //     longitude: 121.01150308586197
-      //   },
-      // ],
+      // passengers: [],
+      passengers: [
+        {
+          name: 'Jason67',
+          phone: '0900000067'
+        },
+      ],
+      departTime: '',
       response: null,
       renderDirectionsFlag: false,
       isLoading: false,
@@ -189,18 +184,38 @@ class DriverGroup extends Component {
   }
 
   renderPlaceList = () => {
-    const { places } = this.state;
-    console.log("places.length = " + places.length)
+    const { places, departTime } = this.state;
     if (places.length > 0) {
       return (
         <Paper
           sx={{ p: '2px 4px', display: 'flex', alignItems: 'center', height: 'auto', width: 400, position: 'fixed', top: '10px', left: '10px', zIndex: 1 }}
         >
           <Stack spacing={1}>
+            <Item>Depart Time: {departTime}</Item>
             {places.map((place, index) => (
               <Item key={index}>
                 {place.name ? place.name : "Unknown Place"}
               </Item>
+            ))}
+          </Stack>
+        </Paper>
+      );
+    }
+    return null;
+  }
+
+  renderPassenger = () => {
+    const { passengers } = this.state;
+    if (passengers.length > 0) {
+      return (
+        <Paper
+          sx={{ p: '2px 4px', display: 'flex', alignItems: 'center', height: 'auto', width: 210, position: 'fixed', top: '10px', right: '10px', zIndex: 1 }}
+        >
+          <Stack spacing={1}>
+            {passengers.map((passenger, index) => (
+              <PassengerItem key={index}>
+                {passenger.name ? passenger.name : "Unknown Passenger"} / {passenger.phone}
+              </PassengerItem>
             ))}
           </Stack>
         </Paper>
@@ -217,6 +232,7 @@ class DriverGroup extends Component {
         googleMapsApiKey={API_KEY}
       >
         {this.renderPlaceList()}
+        {this.renderPassenger()}
         <GoogleMap
           mapContainerStyle={containerStyle}
           center={center}

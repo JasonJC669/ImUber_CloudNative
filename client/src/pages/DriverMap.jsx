@@ -309,10 +309,9 @@ class DriverMap extends Component {
       name: place.name,
       latitude: place.geometry.location.lat(),
       longitude: place.geometry.location.lng(),
-      departTime: departTime,
     }))
 
-    const payload = { phone: phone, places: payload_places }
+    const payload = { phone: phone, places: payload_places, departTime: departTime }
     api.create_group_driver(payload).then(res => {
       window.alert(`Open Group Successful`)
       this.setState({ openGroupFlag: true })

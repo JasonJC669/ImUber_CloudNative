@@ -84,7 +84,10 @@ class PassengerMap extends Component {
     console.log('[DEBUG]-PassengerMap.jsx Sending payload: ', payload)
     // Call api
     await api.get_driver_routes_passenger(payload).then(res => {
-      console.log("[DEBUG]-PassengerMap.jsx Get from api res.data: ", res.data.data)
+      console.log("[DEBUG]-PassengerMap.jsx Get from api res.data: ", res.data)
+      if (res.data.success === false) {
+        window.alert('There are NO routes near by.')
+      }
       this.setState({
         driver_route_list: res.data.data,
         isLoading: false,

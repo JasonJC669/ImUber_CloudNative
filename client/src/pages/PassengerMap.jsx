@@ -229,6 +229,7 @@ class PassengerMap extends Component {
       Dphone: driver_route.phone,
       start: driver_route.places[0].name,
       end: driver_route.places[driver_route.places.length - 1].name,
+      departTime: driver_route.departTime,
       seats: 3,
     }))
 

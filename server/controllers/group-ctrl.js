@@ -16,7 +16,7 @@ createGroup = async (req, res) => {
     console.log("[g-ctrl-create] body: ", req.body)
     console.log("[g-ctrl-create] Dphone: ", Dphone)
     console.log("[g-ctrl-create] Dplaces: ", Dplaces)
-    console.log("[g-ctrl-create] Dphone: ", Dtime)
+    console.log("[g-ctrl-create] Dtime: ", Dtime)
     if (!req.body) {
         return res.status(400).json({
             success: false,

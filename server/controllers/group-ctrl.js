@@ -105,6 +105,7 @@ passengerGetGroup = async (req, res) => {
         return res.status(400).json({
             success: false,
             error: 'You must provide passenger phone',
+            message: 'You must provide passenger phone',
         })
     }
     try{
@@ -112,6 +113,7 @@ passengerGetGroup = async (req, res) => {
         if (!pass_exist) {
             console.log("[g-ctrl-passGetGroup] passenger not exist");
             return res.status(400).json({
+                success: false,
                 error: 'passenger not exist',
                 message: 'passenger not exist',
             });
@@ -120,6 +122,7 @@ passengerGetGroup = async (req, res) => {
         if (!driver_exist) {
             console.log("[g-ctrl-passGetGroup] passenger not join a group");
             return res.status(400).json({
+                success: false,
                 error: 'passenger not join a group',
                 message: 'passenger not join a group',
             });
@@ -141,32 +144,31 @@ passengerGetGroup = async (req, res) => {
 
 joinGroup = async (req, res) => {
     // const Pname = req.body.Pname
-    const Pphone = req.body.Pphone
+    // const Pphone = req.body.Pphone
     // const Dname = req.body.Dname
-    const Dphone = req.body.Dphone
+    // const Dphone = req.body.Dphone
     // const Dplaces = req.body.places
 
-    console.log("[g-ctrl-join] body: ", req.body)
-    console.log("[g-ctrl-join] Pphone: ", Pphone)
-    console.log("[g-ctrl-join] Dphone: ", Dphone)
-    // const Pname = "Max"
-    // const Pphone = "0900000000"
-    // const Dname = "Max"
-    // const Dphone = "0900000000"
+    const Pname = "Max"
+    const Pphone = "0900000000"
+    const Dname = "Max"
+    const Dphone = "0900000000"
     
-    // const Dplaces = [
-    //     {
-    //       name: 'Place 1',
-    //       latitude: 123.456,
-    //       longitude: 78.9,
-    //     },
-    //     {
-    //       name: 'Place 2',
-    //       latitude: 12.345,
-    //       longitude: 67.89,
-    //     },
-    //   ];
-  
+    const Dplaces = [
+        {
+          name: 'Place 1',
+          latitude: 123.456,
+          longitude: 78.9,
+        },
+        {
+          name: 'Place 2',
+          latitude: 12.345,
+          longitude: 67.89,
+        },
+      ];
+      console.log("[g-ctrl-join] body: ", req.body)
+      console.log("[g-ctrl-join] Pphone: ", Pphone)
+      console.log("[g-ctrl-join] Dphone: ", Dphone)
     // console.log(req.body)
     if (!req.body) {
         return res.status(400).json({
@@ -211,7 +213,7 @@ joinGroup = async (req, res) => {
                 message: 'group no seat',
             });
         }
-        else if(pass_exist.dirver){
+        else if(pass_exist.driver && Object.keys(pass_exist.driver).length > 0){
             console.log("[g-ctrl-join] passenger already join a group");
             return res.status(400).json({
                 error: 'passenger already join a group',
@@ -388,7 +390,8 @@ getNearGroups = async (req, res) => {
         else{
             console.log("[g-ctrl-getNear] find near group failed");
             return res.status(400).json({
-                success: false,
+                success: true,
+                data: filteredGroups,
                 error: "find near group failed",
                 message: "find near group failed"
             })

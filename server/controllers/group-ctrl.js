@@ -1,12 +1,22 @@
 const DriverDB = require('../models/driver-model')
 const PassengerDB = require('../models/passenger-model')
 createGroup = async (req, res) => {
-    // const Dname = "Max"
-    // const Dphone = "0900000000"
+   
     const Dphone = req.body.phone
     const Dplaces = req.body.places
+    const Dtime = req.body.deparetTime
+    // const Dname = "Max"
+    // const Dphone = "0900000000"
+    // const Dtime = "Tue Jun 06 2023 19:42:33 GMT+0800 (台北標準時間)"
+    // const Dplaces = {
+    //     name: 'Place 1',
+    //       latitude: 999999,
+    //       longitude: 999999,
+    // }
     console.log("[g-ctrl-create] body: ", req.body)
     console.log("[g-ctrl-create] Dphone: ", Dphone)
+    console.log("[g-ctrl-create] Dplaces: ", Dplaces)
+    console.log("[g-ctrl-create] Dphone: ", Dtime)
     if (!req.body) {
         return res.status(400).json({
             success: false,
@@ -23,11 +33,10 @@ createGroup = async (req, res) => {
             })
         }
         else if (driver_exist) {
-            driver_exist.places = Dplaces
-            driver_exist.save()
+            DriverDB.updateOne({ _id: driver_exist._id }, { deparetTime: Dtime, places: Dplaces  })
                 .then(() => {
-                    console.log("[g-ctrl-create] save group success")
-                    console.log(driver_exist)
+                    // const driver_test = await DriverDB.findOne({ phone: Dphone }).exec();
+                    console.log("[g-ctrl-create] group updated time and places");
                     return res.status(201).json({
                         success: true,
                         id: driver_exist._id,
@@ -36,14 +45,34 @@ createGroup = async (req, res) => {
                     })
                 })
                 .catch(error => {
-                    console.log("[g-ctrl-create] create group failed")
-                    console.log(error)
+                    console.error("[g-ctrl-create] group updated time error:", error);
                     return res.status(400).json({
                         success: true,
                         error: error,
                         message: 'group created faild',
                     })
-                })
+                });
+            // driver_exist.places = Dplaces
+            // driver_exist.save()
+            //     .then(() => {
+            //         console.log("[g-ctrl-create] save group success")
+            //         console.log(driver_exist)
+            //         return res.status(201).json({
+            //             success: true,
+            //             id: driver_exist._id,
+            //             data: driver_exist,
+            //             message: 'group created success',
+            //         })
+            //     })
+            //     .catch(error => {
+            //         console.log("[g-ctrl-create] create group failed")
+            //         console.log(error)
+            //         return res.status(400).json({
+            //             success: true,
+            //             error: error,
+            //             message: 'group created faild',
+            //         })
+            //     })
         }
         else {
             console.log("[g-ctrl-create] driver not exist")
@@ -53,7 +82,11 @@ createGroup = async (req, res) => {
                 message: 'driver not exist',
             })
         }
+        
     })
+    // const driver_update = await DriverDB.findOne({ phone: Dphone }).exec();
+    // console.log("[g-ctrl-create] DEBUG driver_update")
+    // console.log(driver_update)
 }
 getGroup = async (req, res) => {
     // const Dname = req.body.name
@@ -148,27 +181,9 @@ joinGroup = async (req, res) => {
     const Dname = req.body.Dname
     const Dphone = req.body.Dphone
     const Dplaces = req.body.places
-
-    // const Pname = "Max"
-    // const Pphone = "0900000000"
-    // const Dname = "Max"
-    // const Dphone = "0900000000"
-
-    // const Dplaces = [
-    //     {
-    //         name: 'Place 1',
-    //         latitude: 123.456,
-    //         longitude: 78.9,
-    //     },
-    //     {
-    //         name: 'Place 2',
-    //         latitude: 12.345,
-    //         longitude: 67.89,
-    //     },
-    // ];
-    console.log("[g-ctrl-join] body: ", req.body)
-    console.log("[g-ctrl-join] Pphone: ", Pphone)
-    console.log("[g-ctrl-join] Dphone: ", Dphone)
+      console.log("[g-ctrl-join] body: ", req.body)
+      console.log("[g-ctrl-join] Pphone: ", Pphone)
+      console.log("[g-ctrl-join] Dphone: ", Dphone)
     // console.log(req.body)
     if (!req.body) {
         return res.status(400).json({
@@ -213,7 +228,8 @@ joinGroup = async (req, res) => {
                 message: 'group no seat',
             });
         }
-        // else if (pass_exist.driver && Object.keys(pass_exist.driver).length > 0) {
+
+        // else if(pass_exist.driver && Object.keys(pass_exist.driver).length > 0){
         //     console.log("[g-ctrl-join] passenger already join a group");
         //     return res.status(400).json({
         //         error: 'passenger already join a group',
@@ -221,8 +237,7 @@ joinGroup = async (req, res) => {
         //     });
         // }
         else {
-            driver_exist.passenger.concat({ name: pass_exist.name, phone: pass_exist.phone })
-            const driverData = {
+            const driverData ={
                 name: { type: String },
                 phone: { type: String },
             }
@@ -230,43 +245,37 @@ joinGroup = async (req, res) => {
             driverData.phone = driver_exist.phone
             PassengerDB.updateOne({ _id: pass_exist._id }, { driver: driverData })
                 .then(() => {
-                    console.log("Driver updated for the passenger successfully.");
+                    console.log("[g-ctrl-join] Driver updated for the passenger successfully.");
                 })
                 .catch(error => {
-                    console.error("Error updating driver for the passenger:", error);
+                    console.error("[g-ctrl-join] Error updating driver for the passenger:", error);
                 });
-            // pass_exist.set('driver', {
-            //     name: driver_exist.name,
-            //     phone: driver_exist.phone,
-            // });
-            const pass_exist2 = await PassengerDB.findOne({ _id: pass_exist._id }).exec();
+            const temp_passenger = driver_exist.passenger
+            temp_passenger.push({name: pass_exist.name, phone: pass_exist.phone})
+            // console.log("temp_passenger: ", temp_passenger)
+            driver_exist.passenger = temp_passenger
             driver_exist.save()
                 .then(() => {
                     console.log("[g-ctrl-join] driver save success");
                 })
 
-            console.log("===========")
-            console.log("===========")
-            console.log("driverData: ", driverData)
-            console.log("driver_exist.name: ", driver_exist.name)
-            console.log("driver_exist.phone: ", driver_exist.phone)
-            console.log("pass_exist2: ", pass_exist2.driver)
-            console.log("===========")
-            console.log("===========")
+            const driver_update = await DriverDB.findOne({ _id: driver_exist._id }).exec();
+            // console.log("driver_exist: ", driver_exist)
+            console.log("driver_update: ", driver_update)
+            // console.log("===========")
+            // console.log("===========")
+            // console.log("driverData: ", driverData)
+            // console.log("driver_exist.name: ", driver_exist.name)
+            // console.log("driver_exist.phone: ", driver_exist.phone)
+            // console.log("pass_exist2: ", pass_exist2.driver)
+            // console.log("===========")
+            // console.log("===========")
             return res.status(201).json({
                 success: true,
                 id: driver_exist._id,
                 data: driver_exist,
                 message: 'join group success',
             })
-            // pass_exist.dirver.name = driver_exist.name
-            // pass_exist.dirver.phone = driver_exist.phone
-
-
-            // pass_exist.save()
-            // .then(() => {
-            //     console.log("[g-ctrl-join] passenger save success");
-            // })
         }
 
     } catch (error) {
@@ -278,6 +287,7 @@ joinGroup = async (req, res) => {
     }
 
 }
+
 function calculateDistance(lat1, lon1, lat2, lon2) {
     const radLat1 = toRadians(lat1);
     const radLon1 = toRadians(lon1);
@@ -299,10 +309,21 @@ function toRadians(degrees) {
     return degrees * (Math.PI / 180);
 }
 
-getNearGroups = async (req, res) => {
+function compareTime(targetTime) {
+    // var t = "Tue Jun 06 2023 08:42:33 GMT+0800 (台北標準時間)"
+    // var now = new Date(t);
+    var now = new Date();
+    var currentTime = now.getTime();
 
-    // const Pname = req.body.name
-    // const Pphone = req.body.phone
+    var targetTime = new Date(targetTime);
+    var targetTimeValue = targetTime.getTime();
+    // console.log("[g-ctrl-compareTime] currentTime: ", currentTime);
+    // console.log("[g-ctrl-compareTime] targetTimeValue: ", targetTimeValue);
+    return targetTimeValue > currentTime;
+}
+getNearGroups = async (req, res) => {
+    const Pname = req.body.name
+    const Pphone = req.body.phone
     const Plat = req.body.latitude
     const Plon = req.body.longitude
     // const Plat = 123.456
@@ -350,21 +371,23 @@ getNearGroups = async (req, res) => {
         // console.log("groups length: ", groups.length);
         for (let i = 0; i < groups.length; i++) {
             // console.log("gorup: ", i, groups[i]);
-            if (groups[i].places.length > 0) {
-                for (let j = 0; j < groups[i].places.length; j++) {
-                    console.log("dis:", calculateDistance(Plat, Plon,
-                        groups[i].places[j].latitude,
-                        groups[i].places[j].longitude));
-                    if (calculateDistance(Plat, Plon,
-                        groups[i].places[j].latitude,
-                        groups[i].places[j].longitude) <= 1) {
-                        console.log("====== [FIND] =====");
-                        console.log("groups: ", groups[i]);
-                        filteredGroups.push(groups[i])
-                        break;
-
+            if(groups[i].places.length > 0){
+                console.log("[g-ctrl-getNear] compareTime: ", compareTime(groups[i].deparetTime));
+                if(compareTime(groups[i].deparetTime)){
+                    for (let j = 0; j < groups[i].places.length; j++) {
+                        console.log("dis:", calculateDistance(Plat, Plon,
+                            groups[i].places[j].latitude,
+                            groups[i].places[j].longitude));
+                        if(calculateDistance(Plat, Plon,
+                            groups[i].places[j].latitude,
+                            groups[i].places[j].longitude) <= 1){
+                                console.log("====== [FIND] =====");
+                                console.log("groups: ", groups[i]);
+                                filteredGroups.push(groups[i])
+                                break;
+                        
+                        }
                     }
-
                 }
             }
         }
@@ -390,9 +413,8 @@ getNearGroups = async (req, res) => {
         else {
             console.log("[g-ctrl-getNear] find near group failed");
             return res.status(201).json({
-                success: false,
+                success: true,
                 data: filteredGroups,
-                error: "find near group failed",
                 message: "find near group failed"
             })
         }

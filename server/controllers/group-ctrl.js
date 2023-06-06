@@ -4,7 +4,7 @@ createGroup = async (req, res) => {
    
     const Dphone = req.body.phone
     const Dplaces = req.body.places
-    const Dtime = req.body.deparetTime
+    const Dtime = req.body.departTime
     // const Dname = "Max"
     // const Dphone = "0900000000"
     // const Dtime = "Tue Jun 06 2023 19:42:33 GMT+0800 (台北標準時間)"
@@ -33,7 +33,7 @@ createGroup = async (req, res) => {
             })
         }
         else if (driver_exist) {
-            DriverDB.updateOne({ _id: driver_exist._id }, { deparetTime: Dtime, places: Dplaces  })
+            DriverDB.updateOne({ _id: driver_exist._id }, { departTime: Dtime, places: Dplaces  })
                 .then(() => {
                     // const driver_test = await DriverDB.findOne({ phone: Dphone }).exec();
                     console.log("[g-ctrl-create] group updated time and places");
@@ -389,8 +389,8 @@ getNearGroups = async (req, res) => {
         for (let i = 0; i < groups.length; i++) {
             // console.log("gorup: ", i, groups[i]);
             if(groups[i].places.length > 0){
-                console.log("[g-ctrl-getNear] compareTime: ", compareTime(groups[i].deparetTime));
-                if(compareTime(groups[i].deparetTime)){
+                console.log("[g-ctrl-getNear] compareTime: ", compareTime(groups[i].departTime));
+                if(compareTime(groups[i].departTime)){
                     for (let j = 0; j < groups[i].places.length; j++) {
                         console.log("dis:", calculateDistance(Plat, Plon,
                             groups[i].places[j].latitude,
@@ -430,7 +430,7 @@ getNearGroups = async (req, res) => {
         else{
             console.log("[g-ctrl-getNear] find near group failed");
             return res.status(201).json({
-                success: true,
+                success: false,
                 data: filteredGroups,
                 message: "find near group failed"
             })

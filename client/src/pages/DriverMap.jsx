@@ -156,7 +156,7 @@ class DriverMap extends Component {
                 format="HH:mm"
                 size='small'
               />
-              <Button variant="contained" onClick={this.openRoute}>開團(名稱待決定)</Button>
+              <Button variant="contained" onClick={this.openRoute}>開團</Button>
             </LocalizationProvider>
           </Stack>
         </Paper>

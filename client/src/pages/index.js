@@ -5,5 +5,6 @@ import Links from './Links'
 import PassengerMap from './PassengerMap'
 import DriverMap from './DriverMap'
 import DriverGroup from './DriverGroup'
+import PassengerGroup from './PassengerGroup'
 
-export { DriverLogin, PassengerLogin, Driver_road, Links, PassengerMap, DriverMap, DriverGroup }
+export { DriverLogin, PassengerLogin, Driver_road, Links, PassengerMap, DriverMap, DriverGroup, PassengerGroup }

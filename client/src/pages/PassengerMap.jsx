@@ -2,18 +2,11 @@ import React, { Component } from 'react'
 import styled from 'styled-components'
 import ReactTable from 'react-table'
 import 'react-table/react-table.css'
-// eslint-disable-next-line
 import { Redirect } from 'react-router-dom';
 import api from '../api'
-import { Autocomplete, GoogleMap, LoadScript, Marker, DirectionsService, DirectionsRenderer } from '@react-google-maps/api';
-
+import { Autocomplete, GoogleMap, LoadScript, DirectionsService, DirectionsRenderer } from '@react-google-maps/api';
 import Paper from '@mui/material/Paper';
-// eslint-disable-next-line
-import IconButton from '@mui/material/IconButton';
-// eslint-disable-next-line
-import AddIcon from '@mui/icons-material/Add';
 import InputBase from '@mui/material/InputBase';
-import { Route } from 'react-router-dom/cjs/react-router-dom.min';
 import { Button } from '@mui/material';
 
 const API_KEY = process.env.REACT_APP_API_KEY;
@@ -30,24 +23,6 @@ const OverlayTable = styled.div`
   flex-direction: row;
   justify-content: flex-start;
 `;
-
-const ADDbottom = styled.div`
-    color: #ff0000;
-    cursor: pointer;
-`
-
-class ADD extends Component {
-  AddUser = event => {
-    event.preventDefault()
-    if (window.confirm(`Do you want to add the trip that ${this.props.original.Dname} drive from ${this.props.original.start} to ${this.props.original.end}`)) {
-      // api.UesrJoinTeam(this.props.id)
-    }
-  }
-
-  render() {
-    return <ADDbottom onClick={this.AddUser}>ADD</ADDbottom>
-  }
-}
 
 class PassengerMap extends Component {
   constructor(props) {
@@ -276,8 +251,11 @@ class PassengerMap extends Component {
         filterable: true,
       },
       {
-        Header: '',
-        accessor: '',
+        Header: 'DepartTime',
+        accessor: 'departTime',
+        filterable: true,
+      },
+      {
         Cell: (props) => {
           // console.log('[DEBUG] props: ', props)
           return (
@@ -286,8 +264,6 @@ class PassengerMap extends Component {
         },
       },
       {
-        Header: '',
-        accessor: '',
         Cell: (props) => {
           // console.log('[DEBUG] props: ', props)
           return (

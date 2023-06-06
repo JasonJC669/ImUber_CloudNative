@@ -10,6 +10,9 @@ import InputBase from '@mui/material/InputBase';
 import Stack from '@mui/material/Stack';
 import { styled } from '@mui/material/styles';
 import { Button } from '@mui/material';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { TimeField } from '@mui/x-date-pickers/TimeField';
 
 const API_KEY = process.env.REACT_APP_API_KEY;
 
@@ -48,7 +51,7 @@ const Item = styled(Paper)(({ theme }) => ({
   padding: theme.spacing(1),
   textAlign: 'center',
   color: theme.palette.text.secondary,
-  width: '380px',
+  width: '390px',
 }));
 
 class DriverMap extends Component {
@@ -72,6 +75,7 @@ class DriverMap extends Component {
       responses: [],
       renderDirectionsFlag: false,
       openGroupFlag: false,
+      departTime: '',
     }
     this.autocomplete = null
     this.onLoad = this.onLoad.bind(this)
@@ -84,6 +88,7 @@ class DriverMap extends Component {
 
   componentDidMount = () => {
     const { state } = this.props.location
+    this.setState({ departTime: Date().toLocaleString() })
     if (state && state.Dname && state.Dphone) {
       const { Dname, Dphone } = state
       this.setState({ name: Dname, phone: Dphone }, () => {
@@ -127,18 +132,27 @@ class DriverMap extends Component {
   }
 
   renderPlaceList = () => {
-    const { places } = this.state;
+    const { places, departTime } = this.state;
     if (places.length > 0) {
       return (
         <Paper
           sx={{ p: '2px 4px', display: 'flex', alignItems: 'center', height: 'auto', width: 400, position: 'fixed', bottom: '10px', left: '10px', zIndex: 1 }}
         >
-          <Stack spacing={1}>
+          <Stack spacing={1} >
             {places.map((place, index) => (
-              <Item key={index}>
+              <Item key={index} >
                 {place.name ? place.name : "[ERROR] Unknown Place"}
               </Item>
             ))}
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <TimeField
+                label="DepartTime"
+                value={departTime}
+                onChange={(departTime) => { this.setState({ departTime: departTime }) }}
+                format="HH:mm"
+                size='small'
+              />
+            </LocalizationProvider>
             <Button variant="contained" onClick={this.openRoute}>開團(名稱待決定)</Button>
           </Stack>
         </Paper>
@@ -281,7 +295,7 @@ class DriverMap extends Component {
   }
 
   openRoute = () => {
-    const { name, phone, places } = this.state
+    const { name, phone, places, departTime } = this.state
     if (name === '' || phone === '') {
       window.alert(`No name or no phone`)
       return
@@ -295,6 +309,7 @@ class DriverMap extends Component {
       name: place.name,
       latitude: place.geometry.location.lat(),
       longitude: place.geometry.location.lng(),
+      departTime: departTime,
     }))
 
     const payload = { phone: phone, places: payload_places }

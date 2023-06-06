@@ -99,9 +99,20 @@ class Links extends Component {
         const { name, phone } = this.state
         const passenger_info = { name: name, phone: phone }
 
-        await api.passenger_login(passenger_info)
-
-        this.setState({ passenger_flag: true, driver_flag: false })
+        api.passenger_login(passenger_info).then(res => {
+            console.log("[DEBUG]-Links.jsx Get from api res.data: ", res.data)
+            if (res.data.success !== true) {
+                window.alert(`FAIL to log in`)
+                this.setState({ chose_User_type: false })
+                return
+            }
+            if (res.data.data.driver === []) {
+                this.setState({ passenger_flag: true, driver_flag: false })
+            }
+            else {
+                this.setState({ join_group_passenger_flag: true })
+            }
+        })
     }
 
     render() {

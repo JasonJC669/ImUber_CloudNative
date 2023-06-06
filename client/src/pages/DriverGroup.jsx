@@ -1,15 +1,10 @@
 import React, { Component } from 'react'
-// eslint-disable-next-line
-import { Redirect } from 'react-router-dom';
-// eslint-disable-next-line
 import api from '../api'
 
-import { Autocomplete, GoogleMap, LoadScript, Marker, DirectionsService, DirectionsRenderer } from '@react-google-maps/api';
+import { GoogleMap, LoadScript, DirectionsService, DirectionsRenderer } from '@react-google-maps/api';
 import Paper from '@mui/material/Paper';
-import InputBase from '@mui/material/InputBase';
 import Stack from '@mui/material/Stack';
 import { styled } from '@mui/material/styles';
-import { Button } from '@mui/material';
 
 const API_KEY = process.env.REACT_APP_API_KEY;
 

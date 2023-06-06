@@ -10,12 +10,7 @@ export const create_group_driver = payload => api.post(`/group/creat`, payload)
 export const get_group_driver = payload => api.post(`/group/get`, payload)
 export const get_driver_routes_passenger = payload => api.post('/group/getNear', payload)
 export const add_routes_passenger = payload => api.post('/group/join', payload)
-
-export const insertMovie = payload => api.post(`/movie`, payload)
-export const getAllMovies = () => api.get(`/movies`)
-export const updateMovieById = (id, payload) => api.put(`/movie/${id}`, payload)
-export const deleteMovieById = id => api.delete(`/movie/${id}`)
-export const getMovieById = id => api.get(`/movie/${id}`)
+export const get_group_passenger = payload => api.post('/group/passengerGet', payload)
 
 const apis = {
     driver_login,
@@ -24,12 +19,7 @@ const apis = {
     get_group_driver,
     get_driver_routes_passenger,
     add_routes_passenger,
-
-    insertMovie,
-    getAllMovies,
-    updateMovieById,
-    deleteMovieById,
-    getMovieById,
+    get_group_passenger,
 }
 
 export default apis

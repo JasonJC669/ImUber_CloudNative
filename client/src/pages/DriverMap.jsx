@@ -10,6 +10,10 @@ import InputBase from '@mui/material/InputBase';
 import Stack from '@mui/material/Stack';
 import { styled } from '@mui/material/styles';
 import { Button } from '@mui/material';
+import dayjs from 'dayjs';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { TimeField } from '@mui/x-date-pickers/TimeField';
 
 const API_KEY = process.env.REACT_APP_API_KEY;
 
@@ -48,7 +52,7 @@ const Item = styled(Paper)(({ theme }) => ({
   padding: theme.spacing(1),
   textAlign: 'center',
   color: theme.palette.text.secondary,
-  width: '380px',
+  width: '390px',
 }));
 
 class DriverMap extends Component {
@@ -72,6 +76,7 @@ class DriverMap extends Component {
       responses: [],
       renderDirectionsFlag: false,
       openGroupFlag: false,
+      departTime: dayjs(),
     }
     this.autocomplete = null
     this.onLoad = this.onLoad.bind(this)
@@ -126,20 +131,33 @@ class DriverMap extends Component {
     }
   }
 
+  handleDepartTimeChange = (newValue) => {
+    this.setState({ departTime: newValue })
+  }
+
   renderPlaceList = () => {
-    const { places } = this.state;
+    const { places, departTime } = this.state;
     if (places.length > 0) {
       return (
         <Paper
           sx={{ p: '2px 4px', display: 'flex', alignItems: 'center', height: 'auto', width: 400, position: 'fixed', bottom: '10px', left: '10px', zIndex: 1 }}
         >
-          <Stack spacing={1}>
+          <Stack spacing={1} >
             {places.map((place, index) => (
-              <Item key={index}>
+              <Item key={index} >
                 {place.name ? place.name : "[ERROR] Unknown Place"}
               </Item>
             ))}
-            <Button variant="contained" onClick={this.openRoute}>開團(名稱待決定)</Button>
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <TimeField
+                label="DepartTime"
+                value={departTime}
+                onChange={this.handleDepartTimeChange}
+                format="HH:mm"
+                size='small'
+              />
+              <Button variant="contained" onClick={this.openRoute}>開團(名稱待決定)</Button>
+            </LocalizationProvider>
           </Stack>
         </Paper>
       );
@@ -281,7 +299,7 @@ class DriverMap extends Component {
   }
 
   openRoute = () => {
-    const { name, phone, places } = this.state
+    const { name, phone, places, departTime } = this.state
     if (name === '' || phone === '') {
       window.alert(`No name or no phone`)
       return
@@ -297,7 +315,8 @@ class DriverMap extends Component {
       longitude: place.geometry.location.lng(),
     }))
 
-    const payload = { phone: phone, places: payload_places }
+    const payload = { phone: phone, places: payload_places, departTime: departTime.format('llll') }
+    console.log('[DEBUG]-DriverMap.jsx Sending payload:', payload)
     api.create_group_driver(payload).then(res => {
       window.alert(`Open Group Successful`)
       this.setState({ openGroupFlag: true })

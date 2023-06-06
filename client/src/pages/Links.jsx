@@ -55,6 +55,8 @@ class Links extends Component {
             chose_User_type: false,
             passenger_flag: false,
             driver_flag: false,
+            open_group_driver_flag: false,
+            join_group_passenger_flag: false,
         }
     }
 
@@ -76,22 +78,45 @@ class Links extends Component {
         const { name, phone } = this.state
         const driver_info = { name: name, phone: phone }
 
-        await api.driver_login(driver_info)
+        api.driver_login(driver_info).then(res => {
+            console.log("[DEBUG]-Links.jsx Get from api res.data: ", res.data)
+            if (res.data.success !== true) {
+                window.alert(`FAIL to log in`)
+                this.setState({ chose_User_type: false })
+                return
+            }
+            if (res.data.data.places.length !== 0) {
+                this.setState({ open_group_driver_flag: true })
+            }
+            else {
+                this.setState({ passenger_flag: false, driver_flag: true })
+            }
 
-        this.setState({ passenger_flag: false, driver_flag: true })
+        })
     }
 
     Passenger_Login = async () => {
         const { name, phone } = this.state
         const passenger_info = { name: name, phone: phone }
 
-        await api.passenger_login(passenger_info)
-
-        this.setState({ passenger_flag: true, driver_flag: false })
+        api.passenger_login(passenger_info).then(res => {
+            console.log("[DEBUG]-Links.jsx Get from api res.data: ", res.data)
+            if (res.data.success !== true) {
+                window.alert(`FAIL to log in`)
+                this.setState({ chose_User_type: false })
+                return
+            }
+            if (res.data.message === "passenger login success with group") {
+                this.setState({ join_group_passenger_flag: true })
+            }
+            else {
+                this.setState({ passenger_flag: true, driver_flag: false })
+            }
+        })
     }
 
     render() {
-        const { name, phone, chose_User_type, passenger_flag, driver_flag } = this.state
+        const { name, phone, chose_User_type, passenger_flag, driver_flag, open_group_driver_flag, join_group_passenger_flag } = this.state
 
         if (passenger_flag) {
             return <Redirect to={{
@@ -104,6 +129,20 @@ class Links extends Component {
             return <Redirect to={{
                 pathname: "/driver",
                 state: { Dname: name, Dphone: phone },
+            }} />;
+        }
+
+        if (open_group_driver_flag) {
+            return <Redirect to={{
+                pathname: "/driver/group",
+                state: { Dname: name, Dphone: phone },
+            }} />;
+        }
+
+        if (join_group_passenger_flag) {
+            return <Redirect to={{
+                pathname: "/passenger/group",
+                state: { Pname: name, Pphone: phone },
             }} />;
         }
 

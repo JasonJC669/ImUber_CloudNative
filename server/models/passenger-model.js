@@ -10,7 +10,7 @@ const Passenger = new Schema(
         destination: {String, Decimal128, Decimal128},
 
         driverNumber: {type: String },
-        time: [{type: String }],
+        departTime: {type: String },
         place:  {
             name: { type: String },
             latitude: { type: Number },

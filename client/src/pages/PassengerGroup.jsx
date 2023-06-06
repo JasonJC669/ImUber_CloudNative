@@ -1,15 +1,12 @@
 import React, { Component } from 'react'
-// eslint-disable-next-line
-import { Redirect } from 'react-router-dom';
-// eslint-disable-next-line
 import api from '../api'
 
-import { Autocomplete, GoogleMap, LoadScript, Marker, DirectionsService, DirectionsRenderer } from '@react-google-maps/api';
+import { GoogleMap, LoadScript, DirectionsService, DirectionsRenderer } from '@react-google-maps/api';
 import Paper from '@mui/material/Paper';
-import InputBase from '@mui/material/InputBase';
 import Stack from '@mui/material/Stack';
 import { styled } from '@mui/material/styles';
-import { Button } from '@mui/material';
+
+import Grid from '@mui/material/Grid';
 
 const API_KEY = process.env.REACT_APP_API_KEY;
 
@@ -19,7 +16,16 @@ const Item = styled(Paper)(({ theme }) => ({
   padding: theme.spacing(1),
   textAlign: 'center',
   color: theme.palette.text.secondary,
-  width: '380px',
+  width: '390px',
+}));
+
+const TitleItem = styled(Paper)(({ theme }) => ({
+  backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
+  ...theme.typography.body2,
+  padding: theme.spacing(1),
+  textAlign: 'center',
+  color: theme.palette.text.secondary,
+  width: '260px',
 }));
 
 class PassengerGroup extends Component {
@@ -38,6 +44,9 @@ class PassengerGroup extends Component {
       },
       zoom: 8,
       // places: [],
+      Dname: '',
+      Dphone: '',
+      departTime: '',
       places: [
         {
           name: 'NYCU',
@@ -70,9 +79,9 @@ class PassengerGroup extends Component {
 
   componentDidMount = () => {
     const { state } = this.props.location
-    if (state && state.Dname && state.Dphone) {
-      const { Dname, Dphone } = state
-      this.setState({ name: Dname, phone: Dphone }, () => {
+    if (state && state.Pname && state.Pphone) {
+      const { Pname, Pphone } = state
+      this.setState({ name: Pname, phone: Pphone }, () => {
         console.log('[DEBUG]-PassengerGroup.jsx this.state.name ', this.state.name)
         this.getPlaceList()
       })
@@ -94,16 +103,17 @@ class PassengerGroup extends Component {
     this.setState({ isLoading: true })
 
     console.log('[DEBUG]-PassengerGroup.jsx Sending payload: ', payload)
-    // await api.get_group_driver(payload).then(res => {
-    //   console.log("[DEBUG]-PassengerGroup.jsx Get from api res.data: ", res.data)
-    //   console.log("[DEBUG]-PassengerGroup.jsx res.data.data.places: ", res.data.data.places)
-    //   this.setState({
-    //     places: res.data.data.places,
-    //     isLoading: false,
-    //     renderDirectionsFlag: true,
-    //   })
-    // })
-    this.setState({ renderDirectionsFlag: true })
+    await api.get_group_passenger(payload).then(res => {
+      console.log("[DEBUG]-PassengerGroup.jsx Get from api res.data: ", res.data)
+      this.setState({
+        Dname: res.data.data.name,
+        Dphone: res.data.data.phone,
+        places: res.data.data.places,
+        departTime: res.data.data.departTime,
+        isLoading: false,
+        renderDirectionsFlag: true,
+      })
+    })
   }
 
   renderPlaceList = () => {
@@ -199,7 +209,7 @@ class PassengerGroup extends Component {
     if (places.length > 0) {
       return (
         <Paper
-          sx={{ p: '2px 4px', display: 'flex', alignItems: 'center', height: 'auto', width: 400, position: 'fixed', top: '10px', left: '10px', zIndex: 1 }}
+          sx={{ p: '2px 4px', display: 'flex', alignItems: 'center', height: 'auto', width: 400, position: 'fixed', top: '60px', left: '10px', zIndex: 1 }}
         >
           <Stack spacing={1}>
             {places.map((place, index) => (
@@ -215,12 +225,27 @@ class PassengerGroup extends Component {
   }
 
   render() {
-    const { containerStyle, center, zoom } = this.state
+    const { containerStyle, center, zoom, Dname, Dphone, departTime } = this.state
 
     return (
       <LoadScript
         googleMapsApiKey={API_KEY}
       >
+        <Paper
+          sx={{ p: '2px 4px', display: 'flex', alignItems: 'center', height: 'auto', width: 'auto', position: 'fixed', top: '10px', left: '10px', zIndex: 1 }}
+        >
+          <Grid container spacing={1}>
+            <Grid item xs={4}>
+              <TitleItem>Driver's Name: {Dname}</TitleItem>
+            </Grid>
+            <Grid item xs={4}>
+              <TitleItem>Driver's Phone: {Dphone}</TitleItem>
+            </Grid>
+            <Grid item xs={4}>
+              <TitleItem>Depart: {departTime}</TitleItem>
+            </Grid>
+          </Grid>
+        </Paper>
         {this.renderPlaceList()}
         <GoogleMap
           mapContainerStyle={containerStyle}

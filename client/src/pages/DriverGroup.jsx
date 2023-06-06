@@ -89,6 +89,8 @@ class DriverGroup extends Component {
       console.log("[DEBUG]-DriverGroup.jsx res.data.data.places: ", res.data.data.places)
       this.setState({
         places: res.data.data.places,
+        departTime: res.data.data.departTime,
+        passengers: res.data.data.passenger,
         isLoading: false,
         renderDirectionsFlag: true,
       })

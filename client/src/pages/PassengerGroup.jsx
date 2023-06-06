@@ -109,6 +109,7 @@ class PassengerGroup extends Component {
         Dname: res.data.data.name,
         Dphone: res.data.data.phone,
         places: res.data.data.places,
+        departTime: res.data.data.departTime,
         isLoading: false,
         renderDirectionsFlag: true,
       })
@@ -241,7 +242,7 @@ class PassengerGroup extends Component {
               <TitleItem>Driver's Phone: {Dphone}</TitleItem>
             </Grid>
             <Grid item xs={4}>
-              <TitleItem>Depart Time: {departTime}</TitleItem>
+              <TitleItem>Depart: {departTime}</TitleItem>
             </Grid>
           </Grid>
         </Paper>

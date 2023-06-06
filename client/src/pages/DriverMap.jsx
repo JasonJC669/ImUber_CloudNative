@@ -10,6 +10,7 @@ import InputBase from '@mui/material/InputBase';
 import Stack from '@mui/material/Stack';
 import { styled } from '@mui/material/styles';
 import { Button } from '@mui/material';
+import dayjs from 'dayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { TimeField } from '@mui/x-date-pickers/TimeField';
@@ -75,7 +76,7 @@ class DriverMap extends Component {
       responses: [],
       renderDirectionsFlag: false,
       openGroupFlag: false,
-      departTime: '',
+      departTime: dayjs(),
     }
     this.autocomplete = null
     this.onLoad = this.onLoad.bind(this)
@@ -88,7 +89,6 @@ class DriverMap extends Component {
 
   componentDidMount = () => {
     const { state } = this.props.location
-    this.setState({ departTime: Date().toLocaleString() })
     if (state && state.Dname && state.Dphone) {
       const { Dname, Dphone } = state
       this.setState({ name: Dname, phone: Dphone }, () => {
@@ -131,6 +131,10 @@ class DriverMap extends Component {
     }
   }
 
+  handleDepartTimeChange = (newValue) => {
+    this.setState({ departTime: newValue })
+  }
+
   renderPlaceList = () => {
     const { places, departTime } = this.state;
     if (places.length > 0) {
@@ -148,12 +152,12 @@ class DriverMap extends Component {
               <TimeField
                 label="DepartTime"
                 value={departTime}
-                onChange={(departTime) => { this.setState({ departTime: departTime }) }}
+                onChange={this.handleDepartTimeChange}
                 format="HH:mm"
                 size='small'
               />
+              <Button variant="contained" onClick={this.openRoute}>開團(名稱待決定)</Button>
             </LocalizationProvider>
-            <Button variant="contained" onClick={this.openRoute}>開團(名稱待決定)</Button>
           </Stack>
         </Paper>
       );
@@ -311,7 +315,8 @@ class DriverMap extends Component {
       longitude: place.geometry.location.lng(),
     }))
 
-    const payload = { phone: phone, places: payload_places, departTime: departTime }
+    const payload = { phone: phone, places: payload_places, departTime: departTime.format('llll') }
+    console.log('[DEBUG]-DriverMap.jsx Sending payload:', payload)
     api.create_group_driver(payload).then(res => {
       window.alert(`Open Group Successful`)
       this.setState({ openGroupFlag: true })

@@ -106,12 +106,11 @@ class Links extends Component {
                 this.setState({ chose_User_type: false })
                 return
             }
-            if (res.data.data.driver === []) {
-                this.setState({ passenger_flag: true, driver_flag: false })
+            if (res.data.message === "passenger login success with group") {
+                this.setState({ join_group_passenger_flag: true })
             }
             else {
                 this.setState({ passenger_flag: true, driver_flag: false })
-                // this.setState({ join_group_passenger_flag: true })
             }
         })
     }
